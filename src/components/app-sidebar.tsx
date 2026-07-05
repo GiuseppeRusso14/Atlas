@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
   CalendarDays,
+  ChartColumn,
   Clock,
   FileText,
   FolderKanban,
@@ -26,6 +27,7 @@ export const NAV_ITEMS = [
   { href: "/task", label: "Task", icon: SquareCheckBig },
   { href: "/preventivi", label: "Preventivi", icon: FileText },
   { href: "/ore", label: "Ore", icon: Clock },
+  { href: "/report", label: "Report", icon: ChartColumn },
   { href: "/team", label: "Team", icon: UsersRound, adminOnly: true },
 ] as const;
 
