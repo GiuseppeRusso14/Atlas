@@ -1,7 +1,4 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Get a free hosted Postgres database in seconds: `npx create-db`
+// Schema Prisma — fonte di verità del dominio (vedi PROMPT_GESTIONALE_WEBAGENCY.md §5)
 
 generator client {
   provider = "prisma-client"
@@ -10,4 +7,344 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+}
+
+// ---------- Enums ----------
+enum Role {
+  ADMIN
+  MEMBER
+}
+
+enum Reparto {
+  WEB
+  GRAFICA
+  SOCIAL
+}
+
+enum Area {
+  WEB
+  GRAFICA
+  SOCIAL
+}
+
+enum ClientStatus {
+  LEAD
+  ACTIVE
+  PAUSED
+  CLOSED
+}
+
+enum ProjectStatus {
+  DA_INIZIARE
+  IN_CORSO
+  IN_REVISIONE
+  COMPLETATO
+  ARCHIVIATO
+}
+
+enum PaymentStatus {
+  DA_PAGARE
+  ACCONTO
+  SALDATO
+}
+
+enum TaskStatus {
+  TODO
+  IN_CORSO
+  IN_REVISIONE
+  FATTO
+}
+
+enum Priority {
+  BASSA
+  MEDIA
+  ALTA
+  URGENTE
+}
+
+enum QuoteStatus {
+  BOZZA
+  INVIATO
+  ACCETTATO
+  RIFIUTATO
+}
+
+enum ResourceType {
+  LINK
+  NOTA
+}
+
+// Sottotipi area WEB
+enum WebSubtype {
+  SITO_VETRINA
+  LANDING
+  ECOMMERCE
+  WEBAPP
+}
+
+// Sottotipi area GRAFICA
+enum GraphicType {
+  LOGO
+  BRAND_IDENTITY
+  GRAFICA_SOCIAL
+  PRINT
+  ALTRO
+}
+
+enum ApprovalStatus {
+  BOZZA
+  IN_REVISIONE_INTERNA
+  DA_APPROVARE_CLIENTE
+  APPROVATO
+  REVISIONE_RICHIESTA
+}
+
+// Sottotipi area SOCIAL
+enum SocialPlatform {
+  INSTAGRAM
+  FACEBOOK
+  LINKEDIN
+  TIKTOK
+  YOUTUBE
+  ALTRO
+}
+
+enum PostStatus {
+  IDEA
+  BOZZA
+  IN_REVISIONE
+  APPROVATO
+  PROGRAMMATO
+  PUBBLICATO
+}
+
+// ---------- Backbone ----------
+model User {
+  id        String   @id @default(cuid())
+  clerkId   String   @unique
+  name      String
+  email     String   @unique
+  role      Role     @default(MEMBER)
+  reparto   Reparto?
+  avatarUrl String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  projects    Project[]     @relation("ProjectMembers")
+  tasks       Task[]
+  timeEntries TimeEntry[]
+  activities  ActivityLog[]
+}
+
+model Client {
+  id         String       @id @default(cuid())
+  name       String // ragione sociale
+  vatNumber  String? // P.IVA
+  fiscalCode String? // CF
+  email      String?
+  phone      String?
+  website    String?
+  address    String?
+  status     ClientStatus @default(LEAD)
+  tags       String[]
+  notes      String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+
+  contacts  Contact[]
+  projects  Project[]
+  quotes    Quote[]
+  resources Resource[]
+
+  @@index([status])
+}
+
+model Contact {
+  id        String  @id @default(cuid())
+  clientId  String
+  name      String
+  position  String?
+  email     String?
+  phone     String?
+  isPrimary Boolean @default(false)
+  client    Client  @relation(fields: [clientId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+}
+
+model Project {
+  id            String        @id @default(cuid())
+  clientId      String
+  name          String
+  area          Area
+  status        ProjectStatus @default(DA_INIZIARE)
+  description   String?
+  startDate     DateTime?
+  deadline      DateTime?
+  budget        Decimal?      @db.Decimal(10, 2)
+  paymentStatus PaymentStatus @default(DA_PAGARE)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+
+  client      Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  members     User[]      @relation("ProjectMembers")
+  tasks       Task[]
+  resources   Resource[]
+  timeEntries TimeEntry[]
+  quotes      Quote[]
+
+  // dettagli specifici per area (uno solo valorizzato in base a `area`)
+  webDetail    WebDetail?
+  graphicItems GraphicDeliverable[]
+  socialPosts  SocialPost[]
+
+  @@index([clientId])
+  @@index([area, status])
+  @@index([deadline])
+}
+
+model Task {
+  id          String     @id @default(cuid())
+  projectId   String
+  title       String
+  description String?
+  status      TaskStatus @default(TODO)
+  priority    Priority   @default(MEDIA)
+  assigneeId  String?
+  dueDate     DateTime?
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+
+  project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  assignee User?   @relation(fields: [assigneeId], references: [id])
+
+  @@index([projectId, status])
+  @@index([assigneeId])
+  @@index([dueDate])
+}
+
+model Quote {
+  id         String      @id @default(cuid())
+  clientId   String
+  projectId  String?
+  number     String      @unique // progressivo preventivo
+  status     QuoteStatus @default(BOZZA)
+  issuedDate DateTime?
+  validUntil DateTime?
+  notes      String?
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+
+  client  Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project Project?    @relation(fields: [projectId], references: [id])
+  items   QuoteItem[]
+  // total calcolato dagli items on-read (non persistito perché derivabile)
+
+  @@index([clientId])
+  @@index([status])
+}
+
+model QuoteItem {
+  id          String  @id @default(cuid())
+  quoteId     String
+  description String
+  quantity    Decimal @default(1) @db.Decimal(10, 2)
+  unitPrice   Decimal @db.Decimal(10, 2)
+  quote       Quote   @relation(fields: [quoteId], references: [id], onDelete: Cascade)
+
+  @@index([quoteId])
+}
+
+model TimeEntry {
+  id        String   @id @default(cuid())
+  userId    String
+  projectId String
+  minutes   Int
+  date      DateTime @default(now())
+  note      String?
+  user      User     @relation(fields: [userId], references: [id])
+  project   Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, date])
+  @@index([userId, date])
+}
+
+// Note e link generici, agganciabili a cliente o progetto (sostituiscono lo storage file)
+model Resource {
+  id        String       @id @default(cuid())
+  type      ResourceType
+  title     String
+  url       String? // valorizzato se type = LINK
+  content   String? // valorizzato se type = NOTA
+  clientId  String?
+  projectId String?
+  createdAt DateTime     @default(now())
+  client    Client?      @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project   Project?     @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([clientId])
+  @@index([projectId])
+}
+
+model ActivityLog {
+  id         String   @id @default(cuid())
+  userId     String
+  action     String // es. "ha creato il progetto", "ha cambiato stato"
+  entityType String // "Client" | "Project" | "Task" | ...
+  entityId   String
+  createdAt  DateTime @default(now())
+  user       User     @relation(fields: [userId], references: [id])
+
+  @@index([entityType, entityId])
+  @@index([createdAt])
+}
+
+// ---------- Dettagli area WEB ----------
+model WebDetail {
+  id              String     @id @default(cuid())
+  projectId       String     @unique
+  subtype         WebSubtype
+  stagingUrl      String?
+  prodUrl         String?
+  domainName      String?
+  domainExpiry    DateTime?
+  hostingProvider String?
+  hostingExpiry   DateTime?
+  sslExpiry       DateTime?
+  techStack       String?
+  maintenance     Boolean    @default(false)
+  project         Project    @relation(fields: [projectId], references: [id], onDelete: Cascade)
+}
+
+// ---------- Dettagli area GRAFICA ----------
+model GraphicDeliverable {
+  id             String         @id @default(cuid())
+  projectId      String
+  type           GraphicType
+  title          String
+  version        Int            @default(1)
+  approvalStatus ApprovalStatus @default(BOZZA)
+  referenceUrl   String? // link a moodboard/reference/anteprima esterna
+  notes          String?
+  createdAt      DateTime       @default(now())
+  project        Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId])
+}
+
+// ---------- Dettagli area SOCIAL ----------
+model SocialPost {
+  id            String         @id @default(cuid())
+  projectId     String
+  platform      SocialPlatform
+  status        PostStatus     @default(IDEA)
+  scheduledDate DateTime?
+  caption       String?
+  hashtags      String?
+  contentUrl    String? // link alla creatività (es. Drive/Figma)
+  notes         String?
+  createdAt     DateTime       @default(now())
+  project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
+
+  @@index([projectId, scheduledDate])
 }
