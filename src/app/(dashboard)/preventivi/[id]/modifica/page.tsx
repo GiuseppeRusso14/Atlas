@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageHeader } from "@/components/page-header";
 import { QuoteForm } from "@/components/preventivi/quote-form";
 import { updateQuoteAction } from "../../actions";
@@ -24,6 +25,13 @@ export default async function ModificaPreventivoPage({
 
   return (
     <div className="mx-auto max-w-3xl">
+      <Breadcrumbs
+        items={[
+          { label: "Preventivi", href: "/preventivi" },
+          { label: quote.number, href: `/preventivi/${quote.id}` },
+          { label: "Modifica" },
+        ]}
+      />
       <PageHeader title={`Modifica preventivo ${quote.number}`} />
       <QuoteForm
         action={updateQuoteAction.bind(null, quote.id)}

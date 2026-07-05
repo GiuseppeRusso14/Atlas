@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageHeader } from "@/components/page-header";
 import { ClientForm } from "@/components/clienti/client-form";
 import { updateClientAction } from "../../actions";
@@ -17,6 +18,13 @@ export default async function ModificaClientePage({
 
   return (
     <div className="mx-auto max-w-3xl">
+      <Breadcrumbs
+        items={[
+          { label: "Clienti", href: "/clienti" },
+          { label: client.name, href: `/clienti/${client.id}` },
+          { label: "Modifica" },
+        ]}
+      />
       <PageHeader title="Modifica cliente" subtitle={client.name} />
       <ClientForm action={updateClientAction.bind(null, client.id)} client={client} />
     </div>

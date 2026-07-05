@@ -7,6 +7,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { StatusBadge } from "@/components/status-badge";
 import { ActivityFeed } from "@/components/activity-feed";
 import { ResourceSection } from "@/components/resources/resource-section";
@@ -87,6 +88,9 @@ export default async function ProgettoPage({
 
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: "Progetti", href: "/progetti" }, { label: project.name }]}
+      />
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm text-muted-foreground">

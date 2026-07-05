@@ -7,6 +7,7 @@ import {
   FileText,
   FolderKanban,
   LayoutDashboard,
+  Search,
   SquareCheckBig,
   Users,
   UsersRound,
@@ -58,6 +59,18 @@ export function AppSidebar({ userName, userRole, userReparto }: AppSidebarProps)
           <p className="text-xs text-sidebar-foreground/70">{brand.tagline}</p>
         </div>
       </div>
+
+      {/* Ricerca globale: form GET verso /cerca */}
+      <form action="/cerca" className="relative mx-3 mb-3">
+        <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-sidebar-foreground/60" />
+        <input
+          type="search"
+          name="q"
+          placeholder="Cerca…"
+          aria-label="Cerca in tutto il gestionale"
+          className="w-full rounded-xl bg-sidebar-accent py-2 pl-9 pr-3 text-sm text-sidebar-foreground placeholder:text-sidebar-foreground/60 outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+        />
+      </form>
 
       <nav className="flex flex-1 flex-col gap-1 px-3">
         {navItemsFor(userRole === "ADMIN").map(({ href, label, icon: Icon }) => {

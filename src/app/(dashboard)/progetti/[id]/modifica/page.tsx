@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { prisma } from "@/lib/prisma";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageHeader } from "@/components/page-header";
 import { ProjectForm } from "@/components/progetti/project-form";
 import { updateProjectAction } from "../../actions";
@@ -27,6 +28,13 @@ export default async function ModificaProgettoPage({
 
   return (
     <div className="mx-auto max-w-3xl">
+      <Breadcrumbs
+        items={[
+          { label: "Progetti", href: "/progetti" },
+          { label: project.name, href: `/progetti/${project.id}` },
+          { label: "Modifica" },
+        ]}
+      />
       <PageHeader title="Modifica progetto" subtitle={project.name} />
       <ProjectForm
         action={updateProjectAction.bind(null, project.id)}

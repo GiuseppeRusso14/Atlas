@@ -12,6 +12,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { InlineStatusSelect } from "@/components/inline-status-select";
 import { ConfirmActionButton } from "@/components/confirm-action-button";
 import { QUOTE_STATUS } from "@/lib/labels";
@@ -44,6 +45,12 @@ export default async function PreventivoPage({
 
   return (
     <div className="mx-auto max-w-3xl">
+      <Breadcrumbs
+        items={[
+          { label: "Preventivi", href: "/preventivi" },
+          { label: quote.number },
+        ]}
+      />
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <p className="text-sm text-muted-foreground">

@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageHeader } from "@/components/page-header";
 import { QuoteForm } from "@/components/preventivi/quote-form";
 import { createQuoteAction } from "../actions";
@@ -21,6 +22,9 @@ export default async function NuovoPreventivoPage({
 
   return (
     <div className="mx-auto max-w-3xl">
+      <Breadcrumbs
+        items={[{ label: "Preventivi", href: "/preventivi" }, { label: "Nuovo" }]}
+      />
       <PageHeader
         title="Nuovo preventivo"
         subtitle="Il numero progressivo viene assegnato automaticamente"

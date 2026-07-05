@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { StatusBadge } from "@/components/status-badge";
 import { ActivityFeed } from "@/components/activity-feed";
 import { ResourceSection } from "@/components/resources/resource-section";
@@ -67,6 +68,9 @@ export default async function ClientePage({
 
   return (
     <>
+      <Breadcrumbs
+        items={[{ label: "Clienti", href: "/clienti" }, { label: client.name }]}
+      />
       <div className="mb-6 flex flex-wrap items-start justify-between gap-4">
         <div>
           <div className="flex items-center gap-3">

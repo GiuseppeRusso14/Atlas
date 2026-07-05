@@ -1,4 +1,5 @@
 import { prisma } from "@/lib/prisma";
+import { Breadcrumbs } from "@/components/breadcrumbs";
 import { PageHeader } from "@/components/page-header";
 import { ProjectForm } from "@/components/progetti/project-form";
 import { createProjectAction } from "../actions";
@@ -21,6 +22,9 @@ export default async function NuovoProgettoPage({
 
   return (
     <div className="mx-auto max-w-3xl">
+      <Breadcrumbs
+        items={[{ label: "Progetti", href: "/progetti" }, { label: "Nuovo" }]}
+      />
       <PageHeader
         title="Nuovo progetto"
         subtitle="Commessa collegata a un cliente e a un'area"

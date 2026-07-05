@@ -49,6 +49,15 @@ export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
             <SheetHeader>
               <SheetTitle className="text-sidebar-foreground">{brand.name}</SheetTitle>
             </SheetHeader>
+            <form action="/cerca" className="px-2 pb-2">
+              <input
+                type="search"
+                name="q"
+                placeholder="Cerca…"
+                aria-label="Cerca in tutto il gestionale"
+                className="w-full rounded-xl bg-sidebar-accent px-3 py-2 text-sm text-sidebar-foreground placeholder:text-sidebar-foreground/60 outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"
+              />
+            </form>
             <nav className="flex flex-col gap-1 px-2">
               {navItemsFor(isAdmin).map(({ href, label, icon: Icon }) => {
                 const active =
