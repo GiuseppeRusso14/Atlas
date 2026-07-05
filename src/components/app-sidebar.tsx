@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
+  CalendarDays,
   Clock,
   FileText,
   FolderKanban,
@@ -19,6 +20,7 @@ import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/calendario", label: "Calendario", icon: CalendarDays },
   { href: "/clienti", label: "Clienti", icon: Users },
   { href: "/progetti", label: "Progetti", icon: FolderKanban },
   { href: "/task", label: "Task", icon: SquareCheckBig },
