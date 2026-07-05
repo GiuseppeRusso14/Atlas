@@ -147,6 +147,64 @@ export async function updateQuoteStatusAction(
   return { ok: true };
 }
 
+/**
+ * Preventivo ACCETTATO → progetto in un click: crea la commessa precompilata
+ * (cliente, budget dal totale, descrizione dalle righe), collega il preventivo
+ * e apre la modifica del progetto per rifinire area, date e membri.
+ */
+export async function createProjectFromQuoteAction(quoteId: string): Promise<void> {
+  const user = await requireUser();
+  const quote = await prisma.quote.findUnique({
+    where: { id: quoteId },
+    include: { items: true, client: true },
+  });
+  if (!quote) throw new Error("Preventivo non trovato.");
+  if (quote.status !== "ACCETTATO") {
+    throw new Error("Solo un preventivo accettato può diventare un progetto.");
+  }
+  if (quote.projectId) {
+    throw new Error("Questo preventivo è già collegato a un progetto.");
+  }
+
+  const total = quote.items.reduce(
+    (sum, item) => sum + Number(item.quantity) * Number(item.unitPrice),
+    0
+  );
+  const firstItem = quote.items[0]?.description ?? `Preventivo ${quote.number}`;
+  const name = firstItem.length > 60 ? `${firstItem.slice(0, 57)}…` : firstItem;
+  const description = [
+    `Da preventivo ${quote.number}:`,
+    ...quote.items.map(
+      (item) => `• ${item.description} (${Number(item.quantity)} × ${Number(item.unitPrice)}€)`
+    ),
+  ].join("\n");
+
+  const project = await prisma.project.create({
+    data: {
+      clientId: quote.clientId,
+      name,
+      area: "WEB", // area di default: si rifinisce subito nella pagina di modifica
+      status: "DA_INIZIARE",
+      paymentStatus: "DA_PAGARE",
+      budget: total.toFixed(2),
+      description,
+    },
+  });
+  await prisma.quote.update({
+    where: { id: quote.id },
+    data: { projectId: project.id },
+  });
+  await logActivity(
+    user.id,
+    `ha creato il progetto dal preventivo ${quote.number}`,
+    "Project",
+    project.id
+  );
+  revalidatePath("/progetti");
+  revalidatePath(`/preventivi/${quote.id}`);
+  redirect(`/progetti/${project.id}/modifica`);
+}
+
 export async function deleteQuoteAction(quoteId: string): Promise<ActionResult> {
   const user = await requireUser();
   const quote = await prisma.quote.delete({ where: { id: quoteId } });

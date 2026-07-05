@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { FileDown, Pencil, Trash2 } from "lucide-react";
+import { FileDown, FolderPlus, Pencil, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -17,7 +17,11 @@ import { InlineStatusSelect } from "@/components/inline-status-select";
 import { ConfirmActionButton } from "@/components/confirm-action-button";
 import { QUOTE_STATUS } from "@/lib/labels";
 import { formatCurrency, formatDate } from "@/lib/format";
-import { deleteQuoteAction, updateQuoteStatusAction } from "../actions";
+import {
+  createProjectFromQuoteAction,
+  deleteQuoteAction,
+  updateQuoteStatusAction,
+} from "../actions";
 
 export const metadata = { title: "Dettaglio preventivo" };
 
@@ -68,12 +72,19 @@ export default async function PreventivoPage({
           </p>
           <h1 className="mt-1 text-2xl font-bold">Preventivo {quote.number}</h1>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <InlineStatusSelect
             value={quote.status}
             options={QUOTE_STATUS_OPTIONS}
             action={updateQuoteStatusAction.bind(null, quote.id)}
           />
+          {quote.status === "ACCETTATO" && !quote.projectId ? (
+            <form action={createProjectFromQuoteAction.bind(null, quote.id)}>
+              <Button type="submit">
+                <FolderPlus data-icon="inline-start" /> Crea progetto
+              </Button>
+            </form>
+          ) : null}
           <Button variant="outline" asChild>
             <Link href={`/preventivi/${quote.id}/stampa`} target="_blank">
               <FileDown data-icon="inline-start" /> Scarica PDF
