@@ -20,22 +20,22 @@ const prisma = new PrismaClient({ adapter });
 const TEAM = {
   admin: {
     clerkId: "seed_admin",
-    name: "Admin", // ← il tuo nome
-    email: "admin@esempio.it", // ← la tua email reale
+    name: "Giuseppe Russo", // Web Developer
+    email: "giuseppe.russo@esempio.it", // ← sostituisci con l'email di login reale
     role: "ADMIN",
     reparto: "WEB",
   },
   grafico: {
     clerkId: "seed_grafico",
-    name: "Grafico", // ← nome reale del grafico
-    email: "grafica@esempio.it", // ← email reale del grafico
+    name: "Anna Alaimo", // Graphics Designer
+    email: "anna.alaimo@esempio.it", // ← sostituisci con l'email di login reale
     role: "MEMBER",
     reparto: "GRAFICA",
   },
   social: {
     clerkId: "seed_social",
-    name: "Social Media Manager", // ← nome reale del SMM
-    email: "social@esempio.it", // ← email reale del SMM
+    name: "Sara Giannitto", // Social Media Manager
+    email: "sara.giannitto@esempio.it", // ← sostituisci con l'email di login reale
     role: "MEMBER",
     reparto: "SOCIAL",
   },
