@@ -2,6 +2,8 @@
 
 File di supporto al prompt principale (`PROMPT_GESTIONALE_WEBAGENCY.md`). Tienilo aperto mentre parti con la milestone 1. Contiene: prerequisiti, setup passo-passo, comandi utili, configurazione Clerk, trappole di Next.js 16, deploy su Neon, sicurezza e consigli per lavorare bene con Claude Code.
 
+> **STATO: setup COMPLETATO (luglio 2026).** Il progetto è costruito e Clerk è già collegato (via Clerk CLI). Le sezioni 1–2 e 4 restano come documentazione di come si è arrivati qui; per l'uso quotidiano fai riferimento a `README.md` e `COMANDI.md`. Differenze rispetto a questa guida, emerse in corso d'opera: **Prisma 7** (config/seed in `prisma.config.ts`, non in package.json; driver adapter `@prisma/adapter-pg`; client generato in `src/generated/prisma`), **Tailwind 4** (niente `tailwind.config.ts`), middleware in **`src/proxy.ts`**, Clerk configurato con **`clerk init`** (CLI) invece che a mano.
+
 ---
 
 ## 1. Prerequisiti
@@ -72,6 +74,8 @@ npx prisma migrate dev --name init
 npx prisma generate
 ```
 
+> **Nota Prisma 7 (usata in questo progetto):** `prisma init` genera anche `prisma.config.ts`, che carica `.env` via dotenv e contiene la config di **seed** (`migrations.seed: "tsx prisma/seed.ts"`); la chiave `prisma` in package.json non è più letta. Il client va istanziato col driver adapter: `new PrismaClient({ adapter: new PrismaPg({ connectionString }) })`.
+
 ### 2.4 shadcn/ui
 ```bash
 npx shadcn@latest init
@@ -96,7 +100,7 @@ Dopo aver creato `prisma/seed.ts` (come da prompt):
 ```bash
 npx prisma db seed
 ```
-(Configura lo script `prisma.seed` in `package.json` se non presente.)
+(Con Prisma 7 il comando di seed è configurato in `prisma.config.ts` → `migrations.seed`, **non** in package.json. Le persone del team sono nel blocco `TEAM` in cima a `prisma/seed.ts`; le email lì presenti sono segnaposto/test da sostituire con quelle reali.)
 
 ---
 
@@ -136,6 +140,8 @@ npx shadcn@latest add <componente>
 ---
 
 ## 4. Configurazione Clerk (dettaglio)
+
+> **Com'è stato fatto davvero (luglio 2026):** con la **Clerk CLI** — `clerk auth login` + `clerk init --app <app_id>` — che ha collegato il repo all'app "Gestionale-Web-Agency" e scritto da sola le chiavi di sviluppo in `.env`. I passi 1–2 qui sotto restano validi per rifarlo a mano. Per i test senza email reali: indirizzi nel formato `qualcosa+clerk_test@...` (nessuna email inviata, codice OTP fisso `424242`). Manca ancora: webhook di produzione e production instance.
 
 1. **Crea l'applicazione** nella dashboard Clerk. Scegli i metodi di login (email + password è sufficiente per un tool interno).
 2. **Copia le chiavi** in `.env`:
@@ -216,29 +222,36 @@ Qualche accorgimento per un flusso pulito:
 ## 9. Mappa dei file principali (dove sta cosa)
 
 ```
-gestionale-agency/
-├─ CLAUDE.md                      # il prompt principale (contesto persistente)
+Atlas/
+├─ CLAUDE.md                      # contesto persistente (importa questo file e il prompt)
+├─ README.md / COMANDI.md         # guida operativa e cheatsheet comandi
 ├─ docker-compose.yml             # Postgres locale
 ├─ .env / .env.example            # variabili (env NON committato)
+├─ prisma.config.ts               # config Prisma 7 (datasource, seed)
 ├─ prisma/
 │  ├─ schema.prisma               # modello dati (fonte di verità)
 │  ├─ migrations/                 # storia delle migration
-│  └─ seed.ts                     # dati di esempio
-├─ proxy.ts                       # ex middleware.ts (Clerk)
+│  └─ seed.ts                     # dati di esempio (blocco TEAM in testa)
+├─ src/proxy.ts                   # ex middleware.ts (Clerk) — in src/, non in root
+├─ src/generated/prisma/          # client Prisma generato (gitignorato)
 ├─ src/app/
 │  ├─ (auth)/                     # sign-in / sign-up
-│  ├─ (dashboard)/                # app autenticata (clienti, progetti, ...)
+│  ├─ (dashboard)/                # app autenticata; ogni modulo ha actions.ts
 │  ├─ api/webhooks/clerk/         # sync utenti Clerk → DB
-│  └─ globals.css                 # design token (variabili CSS)
+│  └─ globals.css                 # design token (Tailwind 4: @theme + :root/.dark)
 ├─ src/components/
-│  └─ ui/                         # componenti shadcn
+│  ├─ ui/                         # componenti shadcn (button.tsx personalizzato: pill)
+│  └─ ...                         # componenti riusabili (sidebar, form, badge, kanban…)
 ├─ src/config/
 │  └─ brand.ts                    # nome/tagline del prodotto (Atlas) — unico punto da cambiare
-├─ src/lib/
-│  ├─ prisma.ts                   # singleton PrismaClient
-│  └─ auth.ts                     # helper utente corrente / ruolo
-└─ tailwind.config.ts             # token tipografia/colori
+└─ src/lib/
+   ├─ prisma.ts                   # singleton PrismaClient (driver adapter pg)
+   ├─ auth.ts                     # utente corrente, requireUser/requireAdmin, sync Clerk
+   ├─ labels.ts                   # enum → etichette italiane + colori badge
+   └─ format.ts                   # date/valuta/minuti (locale it)
 ```
+
+> Non esiste `tailwind.config.ts`: con Tailwind 4 tutti i token stanno in `globals.css`.
 
 ---
 

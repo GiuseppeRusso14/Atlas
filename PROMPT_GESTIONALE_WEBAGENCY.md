@@ -2,6 +2,8 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
+> **STATO: v1 COMPLETATA (luglio 2026).** Tutte le 10 milestone sono implementate e committate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
 ---
@@ -31,8 +33,8 @@ Il gestionale serve a **gestire i clienti e i loro progetti** attraverso queste 
 
 - **Next.js 16** — App Router, React Server Components, Server Actions.
 - **TypeScript** (strict).
-- **Tailwind CSS** + **shadcn/ui** per i componenti.
-- **Prisma** come ORM.
+- **Tailwind CSS** + **shadcn/ui** per i componenti. **[v1]** È stata usata Tailwind **4**: niente `tailwind.config.ts`, i token vivono in `globals.css` via `@theme`.
+- **Prisma** come ORM. **[v1]** È stata usata Prisma **7**: config e seed in `prisma.config.ts` (non in package.json), driver adapter `@prisma/adapter-pg` obbligatorio, client generato in `src/generated/prisma` (gitignorato, rigenerato in build).
 - **PostgreSQL** — in sviluppo via **Docker** (docker-compose), in produzione su **Neon** (Postgres serverless). Stesso motore in entrambi gli ambienti: le migration Prisma devono funzionare identiche.
 - **Clerk** per l'autenticazione.
 - **Zod** per la validazione di form e input delle Server Actions.
@@ -384,7 +386,7 @@ Regole:
 
 Direzione visiva: **dashboard SaaS moderna, morbida e "friendly"** — angoli molto arrotondati, ampio whitespace, layout a card con ombre leggere, KPI grandi in bold. **Sidebar laterale interamente color corallo** (icona + label; in fondo card utente con avatar e nome). Area contenuti su sfondo chiaro/crema.
 
-**Tutti i valori seguenti vanno impostati come design token centralizzati** (variabili CSS in `globals.css` + `tailwind.config`), MAI hardcoded nei componenti, così sono modificabili in qualsiasi momento. Prevedi anche predisposizione per un eventuale tema scuro.
+**Tutti i valori seguenti vanno impostati come design token centralizzati** (variabili CSS in `globals.css` — con Tailwind 4 il mapping avviene lì via `@theme`, non esiste più `tailwind.config`), MAI hardcoded nei componenti, così sono modificabili in qualsiasi momento. Prevedi anche predisposizione per un eventuale tema scuro (blocco `.dark` già presente).
 
 **Palette:**
 
