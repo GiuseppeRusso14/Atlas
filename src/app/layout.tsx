@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Plus_Jakarta_Sans, Geist_Mono } from "next/font/google";
 import { ClerkProvider } from "@clerk/nextjs";
 import { itIT } from "@clerk/localizations";
+import { shadcn } from "@clerk/ui/themes";
 import { Toaster } from "@/components/ui/sonner";
 import { brand } from "@/config/brand";
 import "./globals.css";
@@ -29,8 +30,9 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // Tema shadcn: i componenti Clerk ereditano i design token dell'app.
   return (
-    <ClerkProvider localization={itIT}>
+    <ClerkProvider localization={itIT} appearance={{ theme: shadcn }}>
       <html
         lang="it"
         className={`${jakarta.variable} ${geistMono.variable} h-full antialiased`}
