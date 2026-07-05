@@ -27,6 +27,12 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-success-foreground: var(--success-foreground);
+  --color-accent-2: var(--accent-2);
+  --color-accent-2-foreground: var(--accent-2-foreground);
+  --color-navy: var(--navy);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
@@ -46,75 +52,113 @@
   --radius-2xl: calc(var(--radius) * 1.8);
   --radius-3xl: calc(var(--radius) * 2.2);
   --radius-4xl: calc(var(--radius) * 2.6);
+  --shadow-card: 0 1px 2px rgb(16 24 39 / 0.04), 0 8px 24px rgb(16 24 39 / 0.06);
 }
 
+/*
+ * Design token Atlas — palette "SaaS morbida": sidebar corallo,
+ * sfondo crema, card bianche. Tutti i colori dell'app passano da qui.
+ */
 :root {
-  --background: oklch(1 0 0);
-  --foreground: oklch(0.145 0 0);
-  --card: oklch(1 0 0);
-  --card-foreground: oklch(0.145 0 0);
-  --popover: oklch(1 0 0);
-  --popover-foreground: oklch(0.145 0 0);
-  --primary: oklch(0.205 0 0);
-  --primary-foreground: oklch(0.985 0 0);
-  --secondary: oklch(0.97 0 0);
-  --secondary-foreground: oklch(0.205 0 0);
-  --muted: oklch(0.97 0 0);
-  --muted-foreground: oklch(0.556 0 0);
-  --accent: oklch(0.97 0 0);
-  --accent-foreground: oklch(0.205 0 0);
-  --destructive: oklch(0.577 0.245 27.325);
-  --border: oklch(0.922 0 0);
-  --input: oklch(0.922 0 0);
-  --ring: oklch(0.708 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --radius: 0.625rem;
-  --sidebar: oklch(0.985 0 0);
-  --sidebar-foreground: oklch(0.145 0 0);
-  --sidebar-primary: oklch(0.205 0 0);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.97 0 0);
-  --sidebar-accent-foreground: oklch(0.205 0 0);
-  --sidebar-border: oklch(0.922 0 0);
-  --sidebar-ring: oklch(0.708 0 0);
+  /* Palette base */
+  --navy: #101827;
+  --background: #f7f4f1; /* crema tiepida */
+  --foreground: var(--navy);
+  --card: #ffffff;
+  --card-foreground: var(--navy);
+  --popover: #ffffff;
+  --popover-foreground: var(--navy);
+
+  /* Corallo: colore primario del brand */
+  --primary: #f26e52;
+  --primary-foreground: #ffffff;
+
+  --secondary: #efe9e4;
+  --secondary-foreground: var(--navy);
+  --muted: #f0ece8;
+  --muted-foreground: #8a8f9a;
+  --accent: #fdeae4; /* tinta corallo leggera per hover/selezioni */
+  --accent-foreground: var(--navy);
+
+  /* Seconda serie grafici / elementi indaco */
+  --accent-2: #5b4ee0;
+  --accent-2-foreground: #ffffff;
+
+  --success: #34c77b;
+  --success-foreground: #ffffff;
+  --destructive: #f2545b;
+  --destructive-foreground: #ffffff;
+
+  --border: #eae4de;
+  --input: #eae4de;
+  --ring: #f26e52;
+
+  /* Serie per i grafici (recharts) */
+  --chart-1: #f26e52;
+  --chart-2: #5b4ee0;
+  --chart-3: #101827;
+  --chart-4: #f9b5a4;
+  --chart-5: #8a8f9a;
+
+  /* Raggio base: card grandi (~20px con rounded-xl) */
+  --radius: 0.875rem;
+
+  /* Sidebar interamente corallo, testo/icone bianchi */
+  --sidebar: #f26e52;
+  --sidebar-foreground: #ffffff;
+  --sidebar-primary: #ffffff;
+  --sidebar-primary-foreground: #f26e52;
+  --sidebar-accent: rgb(255 255 255 / 0.18); /* item attivo: superficie più chiara */
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.15);
+  --sidebar-ring: #ffffff;
 }
 
+/* Predisposizione tema scuro: base navy, stessi accenti */
 .dark {
-  --background: oklch(0.145 0 0);
-  --foreground: oklch(0.985 0 0);
-  --card: oklch(0.205 0 0);
-  --card-foreground: oklch(0.985 0 0);
-  --popover: oklch(0.205 0 0);
-  --popover-foreground: oklch(0.985 0 0);
-  --primary: oklch(0.922 0 0);
-  --primary-foreground: oklch(0.205 0 0);
-  --secondary: oklch(0.269 0 0);
-  --secondary-foreground: oklch(0.985 0 0);
-  --muted: oklch(0.269 0 0);
-  --muted-foreground: oklch(0.708 0 0);
-  --accent: oklch(0.269 0 0);
-  --accent-foreground: oklch(0.985 0 0);
-  --destructive: oklch(0.704 0.191 22.216);
-  --border: oklch(1 0 0 / 10%);
-  --input: oklch(1 0 0 / 15%);
-  --ring: oklch(0.556 0 0);
-  --chart-1: oklch(0.87 0 0);
-  --chart-2: oklch(0.556 0 0);
-  --chart-3: oklch(0.439 0 0);
-  --chart-4: oklch(0.371 0 0);
-  --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --background: #0c1220;
+  --foreground: #f3f4f6;
+  --card: #101827;
+  --card-foreground: #f3f4f6;
+  --popover: #101827;
+  --popover-foreground: #f3f4f6;
+
+  --primary: #f26e52;
+  --primary-foreground: #ffffff;
+
+  --secondary: #1c2536;
+  --secondary-foreground: #f3f4f6;
+  --muted: #1c2536;
+  --muted-foreground: #9aa1ad;
+  --accent: #2a2330;
+  --accent-foreground: #f3f4f6;
+
+  --accent-2: #7b6ff0;
+  --accent-2-foreground: #ffffff;
+
+  --success: #34c77b;
+  --success-foreground: #ffffff;
+  --destructive: #f2545b;
+  --destructive-foreground: #ffffff;
+
+  --border: rgb(255 255 255 / 0.1);
+  --input: rgb(255 255 255 / 0.14);
+  --ring: #f26e52;
+
+  --chart-1: #f26e52;
+  --chart-2: #7b6ff0;
+  --chart-3: #e5e7eb;
+  --chart-4: #f9b5a4;
+  --chart-5: #9aa1ad;
+
+  --sidebar: #16203a;
+  --sidebar-foreground: #f3f4f6;
+  --sidebar-primary: #f26e52;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: rgb(255 255 255 / 0.08);
+  --sidebar-accent-foreground: #ffffff;
+  --sidebar-border: rgb(255 255 255 / 0.08);
+  --sidebar-ring: #f26e52;
 }
 
 @layer base {
