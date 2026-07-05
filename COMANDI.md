@@ -66,6 +66,18 @@ git log --oneline             # storia dei commit (uno per milestone)
 git status                    # cosa è cambiato
 ```
 
+## Backup del database locale
+
+```bash
+# backup completo (file .sql con data nel nome)
+docker exec gestionale-db pg_dump -U gestionale -d gestionale > backup-$(date +%F).sql
+
+# ripristino da un backup (⚠️ sovrascrive i dati attuali)
+cat backup-2026-07-05.sql | docker exec -i gestionale-db psql -U gestionale -d gestionale
+```
+
+In produzione i backup li gestisce **Neon** (point-in-time restore incluso): da lì si può ripristinare a qualsiasi momento nella finestra di retention del piano.
+
 ## Reset completo (quando qualcosa non torna)
 
 ```bash

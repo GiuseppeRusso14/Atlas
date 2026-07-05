@@ -1,0 +1,72 @@
+# CI: lint + typecheck + build ad ogni push/PR su main.
+# Le chiavi Clerk qui sono placeholder di formato valido: servono solo alla
+# build (nessuna chiamata reale). Il job E2E è documentato in fondo, da
+# attivare quando i secrets saranno configurati sul repo.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+env:
+  DATABASE_URL: "postgresql://ci:ci@localhost:5432/ci?schema=public"
+  NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: "pk_test_Y2xlcmsuZXhhbXBsZS5jb20k"
+  CLERK_SECRET_KEY: "sk_test_placeholder000000000000000000000000"
+
+jobs:
+  quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Installa dipendenze
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Typecheck
+        run: npx prisma generate && npx tsc --noEmit
+
+      - name: Build
+        run: npm run build
+
+# ---------------------------------------------------------------------------
+# Job E2E (da attivare in futuro): richiede i secrets su GitHub →
+#   CLERK_PUBLISHABLE_KEY_DEV, CLERK_SECRET_KEY_DEV,
+#   E2E_CLERK_USER_EMAIL, E2E_CLERK_USER_PASSWORD
+#
+#  e2e:
+#    runs-on: ubuntu-latest
+#    services:
+#      postgres:
+#        image: postgres:16
+#        env:
+#          POSTGRES_USER: gestionale
+#          POSTGRES_PASSWORD: gestionale
+#          POSTGRES_DB: gestionale
+#        ports: ["5432:5432"]
+#        options: >-
+#          --health-cmd "pg_isready -U gestionale"
+#          --health-interval 5s --health-timeout 5s --health-retries 10
+#    env:
+#      DATABASE_URL: "postgresql://gestionale:gestionale@localhost:5432/gestionale?schema=public"
+#      NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY: ${{ secrets.CLERK_PUBLISHABLE_KEY_DEV }}
+#      CLERK_SECRET_KEY: ${{ secrets.CLERK_SECRET_KEY_DEV }}
+#      E2E_CLERK_USER_EMAIL: ${{ secrets.E2E_CLERK_USER_EMAIL }}
+#      E2E_CLERK_USER_PASSWORD: ${{ secrets.E2E_CLERK_USER_PASSWORD }}
+#    steps:
+#      - uses: actions/checkout@v4
+#      - uses: actions/setup-node@v4
+#        with: { node-version: 22, cache: npm }
+#      - run: npm ci
+#      - run: npx prisma migrate deploy && npx prisma db seed
+#      - run: npx playwright install --with-deps chromium
+#      - run: npx playwright test
