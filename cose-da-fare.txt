@@ -1,0 +1,15 @@
+Esegui
+
+Quelle che vi farebbero risparmiare tempo ogni settimana
+Export PDF dei preventivi — la più concreta: oggi il preventivo vive solo nel gestionale, ma al cliente va mandato qualcosa. Un bottone "Scarica PDF" con carta intestata (dal brand config), righe e totale. Era già citata come funzione futura nella guida.
+Preventivo accettato → progetto in un click — quando segni un preventivo come "Accettato", proporre "Crea progetto da questo preventivo" con cliente, budget (dal totale) e descrizione precompilati. Rispecchia il flusso reale: oggi ricopiate a mano.
+Calendario globale — oggi il calendario esiste solo dentro il singolo progetto social; una vista /calendario con tutto insieme (post di tutti i progetti, deadline, scadenze dominio/SSL, task in scadenza) sarebbe la pagina che aprite il lunedì mattina.
+Report mensile per cliente — ore lavorate × progetto, preventivi accettati, con export CSV: la base per capire quali clienti rendono e quali mangiano ore (aggiungendo una tariffa oraria interna avresti anche la redditività per progetto: budget vs costo ore).
+Qualità e robustezza (poco visibili, molto sagge)
+CI su GitHub Actions — al push: lint + typecheck + build (+ E2E con un Postgres di servizio). Ora che c'è il test, farlo girare da solo ad ogni modifica è il passo naturale — da fare insieme al primo push del repo.
+Error tracking (Sentry) — in produzione, quando Anna vede "Qualcosa è andato storto", tu vuoi saperlo senza che te lo racconti.
+Strategia backup — su Neon hai già i point-in-time restore; da decidere solo la retention. In locale basta uno script pg_dump in COMANDI.md.
+Idee v2 più ambiziose (quando il resto è in produzione)
+Commenti sui task (con @menzioni) — il primo pezzo di collaborazione vera; oggi i commenti passano per WhatsApp.
+Notifiche — campanella in-app per assegnazioni e scadenze; le email di digest solo se/quando vorrai, con provider dedicato e sempre col tuo consenso esplicito.
+Duplicazione/template — "duplica preventivo" e "progetto da template" (es. il pacchetto sito vetrina standard con i suoi task già pronti).

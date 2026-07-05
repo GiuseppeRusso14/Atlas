@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Pencil, Trash2 } from "lucide-react";
+import { FileDown, Pencil, Trash2 } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -74,6 +74,11 @@ export default async function PreventivoPage({
             options={QUOTE_STATUS_OPTIONS}
             action={updateQuoteStatusAction.bind(null, quote.id)}
           />
+          <Button variant="outline" asChild>
+            <Link href={`/preventivi/${quote.id}/stampa`} target="_blank">
+              <FileDown data-icon="inline-start" /> Scarica PDF
+            </Link>
+          </Button>
           <Button variant="outline" asChild>
             <Link href={`/preventivi/${quote.id}/modifica`}>
               <Pencil data-icon="inline-start" /> Modifica
