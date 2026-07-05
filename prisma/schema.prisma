@@ -130,10 +130,12 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  projects    Project[]     @relation("ProjectMembers")
-  tasks       Task[]
-  timeEntries TimeEntry[]
-  activities  ActivityLog[]
+  projects       Project[]      @relation("ProjectMembers")
+  tasks          Task[]
+  timeEntries    TimeEntry[]
+  activities     ActivityLog[]
+  personalTodos  PersonalTodo[]
+  personalNotes  PersonalNote[]
 }
 
 model Client {
@@ -347,4 +349,33 @@ model SocialPost {
   project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   @@index([projectId, scheduledDate])
+}
+
+// ---------- Produttività personale (pagina "Il mio lavoro") ----------
+// To-do list personale: leggera e slegata dai progetti (i Task di progetto
+// restano un'altra cosa, con Kanban e assegnatario).
+model PersonalTodo {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  done      Boolean   @default(false)
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, done])
+}
+
+// Note personali (blocco appunti dell'utente).
+model PersonalNote {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, updatedAt])
 }

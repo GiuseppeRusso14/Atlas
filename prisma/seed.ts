@@ -385,6 +385,24 @@ async function main() {
     ],
   });
 
+  // ---------- Produttività personale (pagina "Il mio lavoro") ----------
+  await prisma.personalTodo.createMany({
+    data: [
+      { userId: admin.id, title: "Rispondere alla mail di FitLab sul preventivo", dueDate: daysFromNow(1) },
+      { userId: admin.id, title: "Preparare fattura acconto Trattoria" },
+      { userId: admin.id, title: "Aggiornare il portfolio con Boutique Milù", done: true },
+      { userId: grafico.id, title: "Esportare gli asset del logo Ferrara in SVG", dueDate: daysFromNow(2) },
+      { userId: grafico.id, title: "Cercare font per le grafiche autunno" },
+      { userId: social.id, title: "Scaricare gli insight del mese per Milù", dueDate: daysFromNow(3) },
+    ],
+  });
+  await prisma.personalNote.createMany({
+    data: [
+      { userId: admin.id, title: "Idee upsell clienti", content: "Da proporre: manutenzione annuale a Da Peppino, restyling logo a FitLab dopo il sito." },
+      { userId: grafico.id, title: "Palette Ferrara", content: "Blu notte #1B2A4A + oro caldo. Tipografia serif per l'istituzionale, sans per il web." },
+    ],
+  });
+
   console.log("Seed completato ✔");
 }
 

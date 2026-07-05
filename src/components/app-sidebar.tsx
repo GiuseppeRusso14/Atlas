@@ -9,6 +9,7 @@ import {
   FileText,
   FolderKanban,
   LayoutDashboard,
+  ListChecks,
   SquareCheckBig,
   Users,
   UsersRound,
@@ -21,6 +22,7 @@ import { cn } from "@/lib/utils";
 
 export const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/mio-lavoro", label: "Il mio lavoro", icon: ListChecks },
   { href: "/calendario", label: "Calendario", icon: CalendarDays },
   { href: "/clienti", label: "Clienti", icon: Users },
   { href: "/progetti", label: "Progetti", icon: FolderKanban },
