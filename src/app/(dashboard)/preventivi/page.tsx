@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { ArrowRight, Plus } from "lucide-react";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -104,6 +104,7 @@ export default async function PreventiviPage({
                   <TableHead>Emesso il</TableHead>
                   <TableHead>Stato</TableHead>
                   <TableHead className="text-right">Totale</TableHead>
+                  <TableHead className="w-28" />
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -149,6 +150,13 @@ export default async function PreventiviPage({
                       </TableCell>
                       <TableCell className="text-right font-semibold">
                         {formatCurrency(total)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button variant="outline" size="sm" asChild>
+                          <Link href={`/preventivi/${quote.id}`}>
+                            Dettagli <ArrowRight data-icon="inline-end" />
+                          </Link>
+                        </Button>
                       </TableCell>
                     </TableRow>
                   );
