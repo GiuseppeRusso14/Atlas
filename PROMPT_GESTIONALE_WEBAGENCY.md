@@ -2,7 +2,7 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
-> **STATO: v1 + v1.1 + v1.2 COMPLETATE (luglio 2026).** Tutte le milestone 1–21 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+> **STATO: v1 + v1.1 + v1.2 + v1.3 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
 
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
@@ -307,6 +307,29 @@ model SocialPost {
   createdAt     DateTime       @default(now())
   project       Project        @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }
+
+// ---------- [v1.3] Produttività personale (pagina "Il mio lavoro") ----------
+// To-do leggere e slegate dai progetti: NON entrano in Kanban/calendario/report.
+model PersonalTodo {
+  id        String    @id @default(cuid())
+  userId    String
+  title     String
+  done      Boolean   @default(false)
+  dueDate   DateTime?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model PersonalNote {
+  id        String   @id @default(cuid())
+  userId    String
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
 ```
 
 > **Nota sicurezza:** NON prevedere campi per salvare password o credenziali di accesso (FTP, hosting, CMS) in chiaro. Se serve tracciare accessi, usare un `Resource` di tipo `LINK` che punta a un password manager esterno.
@@ -325,6 +348,7 @@ model SocialPost {
 - **Time tracking** — inserimento ore per progetto (minuti, data, nota). Riepilogo ore per progetto e per utente.
 - **Note & Link** — modello `Resource`, agganciabile a cliente o progetto. Sostituisce lo storage file.
 - **Activity log** — registra le azioni principali (creazione/modifica/cambio stato) per cliente e progetto, mostrato nel dettaglio.
+- **[v1.3] "Il mio lavoro"** (`/mio-lavoro`) — vista personale di chi è loggato: ore della settimana, task assegnati per scadenza, progetti attivi, **to-do personali** (aggiunta inline, spunta, scadenza opzionale, "pulisci completate") e **note personali** (blocco appunti). L'ADMIN ha un selettore per vedere la board di chiunque, **note incluse**, ma in sola lettura; le mutazioni lato server agiscono solo sulle righe dell'utente loggato (il `userId` non arriva mai dal client).
 
 ### 6.2 Area WEB
 
@@ -457,6 +481,10 @@ Procedi in quest'ordine, verificando che ogni milestone giri prima di passare al
 21. **Backup locale** — comandi `pg_dump`/ripristino documentati in COMANDI.md (produzione: point-in-time Neon).
 
 Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.
+
+**Milestone v1.3 (produttività personale) — ✅ COMPLETATA:**
+
+25. **"Il mio lavoro"** — pagina `/mio-lavoro` (voce in sidebar per tutti): KPI ore settimana e task aperti, i miei task per scadenza (ritardi in rosso), i miei progetti attivi, to-do list personale e note personali (modelli `PersonalTodo`/`PersonalNote`, slegati dai progetti). Selettore utente per l'ADMIN (vede tutto di tutti, note comprese, in sola lettura). ⚠️ Dopo `prisma migrate dev`/`generate` va riavviato il dev server: il singleton Prisma su `globalThis` trattiene il client vecchio.
 
 **Milestone v2 (pianificate, da fare a prodotto in produzione):**
 
