@@ -3,15 +3,7 @@
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
-
-/** Dimensione pagina standard delle liste. */
-export const PAGE_SIZE = 25;
-
-/** Legge e normalizza il query param `pagina` (1-based). */
-export function parsePage(value: string | undefined): number {
-  const n = Number(value);
-  return Number.isInteger(n) && n >= 1 ? n : 1;
-}
+import { PAGE_SIZE } from "@/lib/pagination";
 
 /**
  * Barra di paginazione URL-driven (param `pagina`), conserva gli altri

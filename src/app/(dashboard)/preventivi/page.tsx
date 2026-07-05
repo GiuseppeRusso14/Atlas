@@ -13,7 +13,8 @@ import {
 } from "@/components/ui/table";
 import { PageHeader } from "@/components/page-header";
 import { FilterBar } from "@/components/filter-bar";
-import { PAGE_SIZE, PaginationBar, parsePage } from "@/components/pagination-bar";
+import { PaginationBar } from "@/components/pagination-bar";
+import { PAGE_SIZE, parsePage } from "@/lib/pagination";
 import { InlineStatusSelect } from "@/components/inline-status-select";
 import { QUOTE_STATUS } from "@/lib/labels";
 import { formatCurrency, formatDate } from "@/lib/format";

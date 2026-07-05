@@ -14,7 +14,8 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { FilterBar } from "@/components/filter-bar";
-import { PAGE_SIZE, PaginationBar, parsePage } from "@/components/pagination-bar";
+import { PaginationBar } from "@/components/pagination-bar";
+import { PAGE_SIZE, parsePage } from "@/lib/pagination";
 import {
   AREA_LABEL,
   PAYMENT_STATUS,
