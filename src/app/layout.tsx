@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { itIT } from "@clerk/localizations";
 import { shadcn } from "@clerk/ui/themes";
 import { Toaster } from "@/components/ui/sonner";
+import { ThemeProvider } from "@/components/theme-provider";
 import { brand } from "@/config/brand";
 import "./globals.css";
 
@@ -35,11 +36,14 @@ export default function RootLayout({
     <ClerkProvider localization={itIT} appearance={{ theme: shadcn }}>
       <html
         lang="it"
+        suppressHydrationWarning
         className={`${jakarta.variable} ${geistMono.variable} h-full antialiased`}
       >
         <body className="min-h-full flex flex-col">
-          {children}
-          <Toaster />
+          <ThemeProvider>
+            {children}
+            <Toaster />
+          </ThemeProvider>
         </body>
       </html>
     </ClerkProvider>

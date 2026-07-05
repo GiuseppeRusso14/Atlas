@@ -14,6 +14,7 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { navItemsFor } from "@/components/app-sidebar";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { brand, brandMonogram } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +32,7 @@ export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
         <span className="font-bold">{brand.name}</span>
       </div>
       <div className="flex items-center gap-2">
+        <ThemeToggle className="text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-foreground" />
         <UserButton appearance={{ elements: { avatarBox: "size-8" } }} />
         <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger asChild>

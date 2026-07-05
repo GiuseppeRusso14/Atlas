@@ -12,6 +12,7 @@ import {
   UsersRound,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { brand, brandMonogram } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
@@ -83,13 +84,14 @@ export function AppSidebar({ userName, userRole, userReparto }: AppSidebarProps)
       {/* Card utente in fondo alla sidebar */}
       <div className="m-3 flex items-center gap-3 rounded-xl bg-sidebar-accent p-3">
         <UserButton appearance={{ elements: { avatarBox: "size-9" } }} />
-        <div className="min-w-0">
+        <div className="min-w-0 flex-1">
           <p className="truncate text-sm font-semibold">{userName}</p>
           <p className="truncate text-xs text-sidebar-foreground/70">
             {userRole === "ADMIN" ? "Admin" : "Membro"}
             {userReparto ? ` · ${REPARTO_LABEL[userReparto] ?? userReparto}` : ""}
           </p>
         </div>
+        <ThemeToggle className="shrink-0 text-sidebar-foreground hover:bg-sidebar/60 hover:text-sidebar-foreground" />
       </div>
     </aside>
   );
