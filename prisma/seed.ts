@@ -21,7 +21,9 @@ const TEAM = {
   admin: {
     clerkId: "seed_admin",
     name: "Giuseppe Russo", // Web Developer
-    email: "giuseppe.russo@esempio.it", // ← sostituisci con l'email di login reale
+    // Email di TEST Clerk (+clerk_test): nessuna email reale inviata, codice OTP fisso 424242.
+    // Quando passerete alle email vere, sostituiscila e rilancia il seed.
+    email: "giuseppe+clerk_test@esempio.it",
     role: "ADMIN",
     reparto: "WEB",
   },
