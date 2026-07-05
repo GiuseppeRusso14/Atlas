@@ -14,7 +14,7 @@ import { UserButton } from "@clerk/nextjs";
 import { brand, brandMonogram } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
-const NAV_ITEMS = [
+export const NAV_ITEMS = [
   { href: "/", label: "Dashboard", icon: LayoutDashboard },
   { href: "/clienti", label: "Clienti", icon: Users },
   { href: "/progetti", label: "Progetti", icon: FolderKanban },
@@ -39,7 +39,7 @@ export function AppSidebar({ userName, userRole, userReparto }: AppSidebarProps)
   const pathname = usePathname();
 
   return (
-    <aside className="hidden w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:flex">
+    <aside className="hidden w-64 shrink-0 flex-col bg-sidebar text-sidebar-foreground md:sticky md:top-0 md:flex md:h-screen">
       {/* Logo: monogramma + nome, entrambi derivati dal brand config */}
       <div className="flex items-center gap-3 px-6 pb-6 pt-8">
         <span className="flex size-10 items-center justify-center rounded-xl bg-sidebar-accent text-lg font-bold">
