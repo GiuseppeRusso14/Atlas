@@ -59,8 +59,9 @@ avviene in due modi complementari, documentati in [`src/lib/auth.ts`](src/lib/au
 
 **Ruoli e reparti.** I nuovi utenti nascono `MEMBER` senza reparto: imposta
 `role`/`reparto` via `npx prisma studio` (o direttamente nel seed). Il seed crea
-già 3 utenti: ADMIN (`info@planstudios.it`), grafica e social — se fai login con
-una di quelle email, l'account Clerk viene collegato alla riga corrispondente.
+già 3 utenti (ADMIN, grafica, social) con **email segnaposto**: sostituiscile
+nel blocco `TEAM` in cima a `prisma/seed.ts` con le email reali del team — al
+primo login l'account Clerk viene collegato alla riga con la stessa email.
 
 ### Permessi
 
