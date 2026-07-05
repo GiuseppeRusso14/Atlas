@@ -66,6 +66,8 @@ Autenticazione gestita con **Clerk**. Due ruoli soltanto:
 
 Oltre al ruolo, ogni utente ha un **reparto** (`WEB` | `GRAFICA` | `SOCIAL`), che serve per filtrare e assegnare il lavoro per competenza, **non** per limitare i permessi.
 
+> **[v1] Stato accessi (luglio 2026):** i 3 account Clerk esistono tutti (email di test `+clerk_test`, OTP fisso `424242`): Giuseppe = ADMIN/Web, Anna = MEMBER/Grafica, Sara = MEMBER/Social (creata via Backend API, nessuna email inviata). Le **registrazioni pubbliche sono chiuse** (`sign_up_mode: restricted` sull'istanza dev): nuovi utenti solo da dashboard Clerk o via API. Da reimpostare anche sulla production instance al deploy — vedi `Produzione-todo.md`.
+
 **Pattern di integrazione Clerk ↔ DB (importante):**
 
 - L'identità (login, sessione) vive su Clerk.

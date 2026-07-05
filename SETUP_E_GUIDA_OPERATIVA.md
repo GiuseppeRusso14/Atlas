@@ -143,7 +143,9 @@ npx shadcn@latest add <componente>
 
 ## 4. Configurazione Clerk (dettaglio)
 
-> **Com'è stato fatto davvero (luglio 2026):** con la **Clerk CLI** — `clerk auth login` + `clerk init --app <app_id>` — che ha collegato il repo all'app "Gestionale-Web-Agency" e scritto da sola le chiavi di sviluppo in `.env`. I passi 1–2 qui sotto restano validi per rifarlo a mano. Per i test senza email reali: indirizzi nel formato `qualcosa+clerk_test@...` (nessuna email inviata, codice OTP fisso `424242`). Manca ancora: webhook di produzione e production instance.
+> **Com'è stato fatto davvero (luglio 2026):** con la **Clerk CLI** — `clerk auth login` + `clerk init --app <app_id>` — che ha collegato il repo all'app "Gestionale-Web-Agency" e scritto da sola le chiavi di sviluppo in `.env`. I passi 1–2 qui sotto restano validi per rifarlo a mano. Per i test senza email reali: indirizzi nel formato `qualcosa+clerk_test@...` (nessuna email inviata, codice OTP fisso `424242`).
+>
+> **Stato accessi:** i 3 account esistono tutti (Giuseppe ADMIN, Anna e Sara MEMBER; Sara creata via `clerk users create`, nessuna email inviata) e le **registrazioni pubbliche sono chiuse** (`sign_up_mode: restricted`, impostato via `clerk config patch`). Nuovi utenti: solo da dashboard Clerk ("Create user"/invito) o via API. Manca ancora: production instance + webhook di produzione → vedi `Produzione-todo.md`.
 
 1. **Crea l'applicazione** nella dashboard Clerk. Scegli i metodi di login (email + password è sufficiente per un tool interno).
 2. **Copia le chiavi** in `.env`:
