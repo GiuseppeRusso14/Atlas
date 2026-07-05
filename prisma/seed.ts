@@ -12,6 +12,35 @@ import { PrismaClient } from "../src/generated/prisma/client";
 const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
 const prisma = new PrismaClient({ adapter });
 
+/**
+ * ⬇️ IL TEAM — metti qui nomi ed email VERE delle 3 persone.
+ * L'email è la chiave di aggancio: al primo login con Clerk, l'account
+ * viene collegato alla riga con la stessa email (e ne eredita role/reparto).
+ */
+const TEAM = {
+  admin: {
+    clerkId: "seed_admin",
+    name: "Giuseppe Russo",
+    email: "info@planstudios.it",
+    role: "ADMIN",
+    reparto: "WEB",
+  },
+  grafico: {
+    clerkId: "seed_grafico",
+    name: "Laura Bianchi", // ← nome reale del grafico
+    email: "laura@planstudios.it", // ← email reale del grafico
+    role: "MEMBER",
+    reparto: "GRAFICA",
+  },
+  social: {
+    clerkId: "seed_social",
+    name: "Marco Verdi", // ← nome reale del social media manager
+    email: "marco@planstudios.it", // ← email reale del SMM
+    role: "MEMBER",
+    reparto: "SOCIAL",
+  },
+} as const;
+
 /** Giorni relativi a oggi, per avere scadenze sempre "vive" nel seed. */
 function daysFromNow(days: number): Date {
   const d = new Date();
@@ -35,34 +64,10 @@ async function main() {
   await prisma.client.deleteMany();
   await prisma.user.deleteMany();
 
-  // ---------- Utenti ----------
-  const admin = await prisma.user.create({
-    data: {
-      clerkId: "seed_admin",
-      name: "Giuseppe Rossi",
-      email: "info@planstudios.it",
-      role: "ADMIN",
-      reparto: "WEB",
-    },
-  });
-  const grafico = await prisma.user.create({
-    data: {
-      clerkId: "seed_grafico",
-      name: "Laura Bianchi",
-      email: "laura@planstudios.it",
-      role: "MEMBER",
-      reparto: "GRAFICA",
-    },
-  });
-  const social = await prisma.user.create({
-    data: {
-      clerkId: "seed_social",
-      name: "Marco Verdi",
-      email: "marco@planstudios.it",
-      role: "MEMBER",
-      reparto: "SOCIAL",
-    },
-  });
+  // ---------- Utenti (vedi TEAM in cima al file) ----------
+  const admin = await prisma.user.create({ data: TEAM.admin });
+  const grafico = await prisma.user.create({ data: TEAM.grafico });
+  const social = await prisma.user.create({ data: TEAM.social });
 
   // ---------- Clienti ----------
   const trattoria = await prisma.client.create({
