@@ -23,10 +23,11 @@ export async function getCurrentUser(): Promise<User | null> {
   if (!clerkUser) return null;
 
   const email = clerkUser.emailAddresses[0]?.emailAddress ?? "";
-  const name =
-    [clerkUser.firstName, clerkUser.lastName].filter(Boolean).join(" ") ||
-    email ||
-    "Utente";
+  // Nome da Clerk solo se davvero presente: mai sovrascrivere il nome del
+  // seed con un fallback (es. l'email) quando il profilo Clerk è senza nome.
+  const clerkName = [clerkUser.firstName, clerkUser.lastName]
+    .filter(Boolean)
+    .join(" ");
 
   const byEmail = email
     ? await prisma.user.findUnique({ where: { email } })
@@ -36,7 +37,11 @@ export async function getCurrentUser(): Promise<User | null> {
     // Riga pre-esistente (seed o creata a mano): collega il clerkId reale.
     return prisma.user.update({
       where: { id: byEmail.id },
-      data: { clerkId, name, avatarUrl: clerkUser.imageUrl },
+      data: {
+        clerkId,
+        name: clerkName || byEmail.name,
+        avatarUrl: clerkUser.imageUrl,
+      },
     });
   }
 
@@ -44,7 +49,7 @@ export async function getCurrentUser(): Promise<User | null> {
     data: {
       clerkId,
       email,
-      name,
+      name: clerkName || email || "Utente",
       avatarUrl: clerkUser.imageUrl,
       // role/reparto di default: MEMBER senza reparto; l'ADMIN li imposta.
     },

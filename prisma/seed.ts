@@ -30,14 +30,14 @@ const TEAM = {
   grafico: {
     clerkId: "seed_grafico",
     name: "Anna Alaimo", // Graphics Designer
-    email: "anna.alaimo@esempio.it", // ← sostituisci con l'email di login reale
+    email: "anna+clerk_test@esempio.it", // email di test (OTP 424242) — poi sostituire con quella reale
     role: "MEMBER",
     reparto: "GRAFICA",
   },
   social: {
     clerkId: "seed_social",
     name: "Sara Giannitto", // Social Media Manager
-    email: "sara.giannitto@esempio.it", // ← sostituisci con l'email di login reale
+    email: "sara+clerk_test@esempio.it", // email di test (OTP 424242) — poi sostituire con quella reale
     role: "MEMBER",
     reparto: "SOCIAL",
   },

@@ -20,10 +20,10 @@ export async function POST(req: NextRequest) {
   if (evt.type === "user.created" || evt.type === "user.updated") {
     const data = evt.data;
     const email = data.email_addresses?.[0]?.email_address ?? "";
-    const name =
-      [data.first_name, data.last_name].filter(Boolean).join(" ") ||
-      email ||
-      "Utente";
+    // Nome da Clerk solo se presente: mai sovrascrivere quello già nel DB.
+    const clerkName = [data.first_name, data.last_name]
+      .filter(Boolean)
+      .join(" ");
 
     // Aggancia per clerkId; se assente, per email (riga creata dal seed).
     const existing =
@@ -33,11 +33,21 @@ export async function POST(req: NextRequest) {
     if (existing) {
       await prisma.user.update({
         where: { id: existing.id },
-        data: { clerkId: data.id, name, email, avatarUrl: data.image_url },
+        data: {
+          clerkId: data.id,
+          name: clerkName || existing.name,
+          email,
+          avatarUrl: data.image_url,
+        },
       });
     } else {
       await prisma.user.create({
-        data: { clerkId: data.id, name, email, avatarUrl: data.image_url },
+        data: {
+          clerkId: data.id,
+          name: clerkName || email || "Utente",
+          email,
+          avatarUrl: data.image_url,
+        },
       });
     }
   }
