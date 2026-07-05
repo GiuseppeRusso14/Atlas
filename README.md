@@ -74,6 +74,20 @@ primo login l'account Clerk viene collegato alla riga con la stessa email.
 L'enforcement è **doppio**: UI (azioni nascoste) + Server Action
 (`requireAdmin()` in `src/lib/auth.ts`).
 
+## Test E2E (Playwright)
+
+```bash
+npm run test:e2e
+```
+
+Copre il flusso critico: login → crea cliente → crea progetto → crea task →
+eliminazione (pulizia). Usa un **utente Clerk di test** (email `+clerk_test`,
+codice fisso `424242`, nessuna email reale inviata): imposta in `.env`
+`E2E_CLERK_USER_EMAIL` e `E2E_CLERK_USER_PASSWORD`. Il login nel test avviene
+con la strategia "codice email" per non far scattare la verifica nuovo
+dispositivo. Servono Docker (DB) attivo e le chiavi Clerk in `.env`; il dev
+server viene avviato automaticamente se non è già in esecuzione.
+
 ## Comandi utili
 
 ```bash
