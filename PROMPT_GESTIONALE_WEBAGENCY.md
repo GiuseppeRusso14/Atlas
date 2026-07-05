@@ -437,6 +437,14 @@ Procedi in quest'ordine, verificando che ogni milestone giri prima di passare al
 9. **Dashboard** — KPI, grafici, feed attività, alert scadenze.
 10. **Rifinitura** — stati loading/error, responsive, coerenza design token, pulizia.
 
+**Milestone v1.1 (migliorie post-v1, luglio 2026):**
+
+11. **Team (solo ADMIN)** — pagina con lista utenti e cambio ruolo/reparto dalla UI (senza Prisma Studio); protezione: un ADMIN non può declassare l'ultimo ADMIN.
+12. **Tema scuro** — toggle chiaro/scuro/sistema con `next-themes` sui token `.dark` già predisposti.
+13. **Paginazione** — liste clienti/progetti/preventivi paginate server-side.
+14. **UX** — ricerca globale (clienti, progetti, task, preventivi) e breadcrumb nelle pagine di dettaglio. (Le azioni sui task sono già tracciate nell'activity log del progetto.)
+15. **Test E2E** — Playwright: login (utente di test Clerk) → crea cliente → progetto → task.
+
 ---
 
 ## 12. Criteri di accettazione v1
