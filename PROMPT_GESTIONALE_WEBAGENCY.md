@@ -2,7 +2,7 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
-> **STATO: v1 + v1.1 COMPLETATE (luglio 2026).** Tutte le milestone 1–15 sono implementate e committate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+> **STATO: v1 + v1.1 + v1.2 COMPLETATE (luglio 2026).** Tutte le milestone 1–21 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
 
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
@@ -447,14 +447,16 @@ Procedi in quest'ordine, verificando che ogni milestone giri prima di passare al
 14. **UX** — ricerca globale `/cerca` con **anteprima live** nella sidebar (dropdown via `/api/cerca`, debounce, risultati raggruppati e cliccabili); barra di ricerca anche sulla lista preventivi (numero o cliente); breadcrumb su tutte le pagine di dettaglio/modifica/creazione; `cursor: pointer` ripristinato globalmente sugli elementi cliccabili (Tailwind 4 non lo applica più ai button).
 15. **Test E2E** — Playwright (`npm run test:e2e`): login con utente di test Clerk (strategia codice email, OTP fisso 424242 — il login con password farebbe scattare la verifica nuovo-dispositivo ad ogni run) → crea cliente → progetto → task → eliminazione di pulizia.
 
-**Milestone v1.2 (risparmio tempo settimanale + qualità):**
+**Milestone v1.2 (risparmio tempo settimanale + qualità) — ✅ TUTTE COMPLETATE:**
 
-16. **Export PDF preventivi** — pagina di stampa A4 (`/preventivi/[id]/stampa`, layout senza sidebar) con carta intestata dal brand config, righe e totale; bottone "Scarica PDF" (stampa del browser → salva come PDF, zero dipendenze).
+16. **Export PDF preventivi** — pagina di stampa A4 (`/preventivi/[id]/stampa`, route group `(print)` senza sidebar) con carta intestata dal brand config, righe e totale; bottone "Scarica PDF" (stampa del browser → salva come PDF, zero dipendenze).
 17. **Preventivo accettato → progetto** — sul preventivo ACCETTATO senza progetto collegato: bottone "Crea progetto" che precompila cliente, budget (dal totale) e descrizione (dalle righe), collega il preventivo e apre la modifica del progetto.
-18. **Calendario globale** — vista `/calendario` mensile con tutto insieme: post social di tutti i progetti, deadline progetti, scadenze dominio/hosting/SSL, task in scadenza; filtri per tipo, voce in sidebar.
-19. **Report mensile** — `/report` per mese: ore per cliente/progetto e preventivi accettati, con export CSV.
-20. **CI GitHub Actions** — lint + typecheck + build ad ogni push (E2E attivabile con i secrets Clerk).
-21. **Backup locale** — script `pg_dump` documentato in COMANDI.md (produzione: point-in-time Neon).
+18. **Calendario globale** — vista `/calendario` mensile con tutto insieme: post social di tutti i progetti, deadline progetti, scadenze dominio/hosting/SSL, task in scadenza; filtri per tipo (badge toggle), voce in sidebar.
+19. **Report mensile** — `/report` per mese: ore per cliente/progetto e preventivi accettati (attribuiti per data di emissione), KPI e export CSV (`/api/report/csv`); voce in sidebar.
+20. **CI GitHub Actions** — `.github/workflows/ci.yml`: lint + typecheck + build ad ogni push/PR su main; job E2E già scritto ma commentato (si attiva coi secrets Clerk sul repo).
+21. **Backup locale** — comandi `pg_dump`/ripristino documentati in COMANDI.md (produzione: point-in-time Neon).
+
+Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.
 
 **Milestone v2 (pianificate, da fare a prodotto in produzione):**
 
