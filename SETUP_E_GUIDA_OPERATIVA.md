@@ -2,7 +2,9 @@
 
 File di supporto al prompt principale (`PROMPT_GESTIONALE_WEBAGENCY.md`). Tienilo aperto mentre parti con la milestone 1. Contiene: prerequisiti, setup passo-passo, comandi utili, configurazione Clerk, trappole di Next.js 16, deploy su Neon, sicurezza e consigli per lavorare bene con Claude Code.
 
-> **STATO: setup COMPLETATO (luglio 2026).** Il progetto è costruito e Clerk è già collegato (via Clerk CLI). Le sezioni 1–2 e 4 restano come documentazione di come si è arrivati qui; per l'uso quotidiano fai riferimento a `README.md` e `COMANDI.md`. Differenze rispetto a questa guida, emerse in corso d'opera: **Prisma 7** (config/seed in `prisma.config.ts`, non in package.json; driver adapter `@prisma/adapter-pg`; client generato in `src/generated/prisma`), **Tailwind 4** (niente `tailwind.config.ts`), middleware in **`src/proxy.ts`**, Clerk configurato con **`clerk init`** (CLI) invece che a mano.
+> **STATO: setup COMPLETATO (luglio 2026), app in v1.1.** Il progetto è costruito e Clerk è già collegato (via Clerk CLI). Le sezioni 1–2 e 4 restano come documentazione di come si è arrivati qui; per l'uso quotidiano fai riferimento a `README.md` e `COMANDI.md`. Differenze rispetto a questa guida, emerse in corso d'opera: **Prisma 7** (config/seed in `prisma.config.ts`, non in package.json; driver adapter `@prisma/adapter-pg`; client generato in `src/generated/prisma`), **Tailwind 4** (niente `tailwind.config.ts`), middleware in **`src/proxy.ts`**, Clerk configurato con **`clerk init`** (CLI) invece che a mano.
+>
+> **Test E2E**: `npm run test:e2e` (Playwright) copre login → cliente → progetto → task; usa l'utente Clerk di test (`+clerk_test`, OTP `424242`) con credenziali in `.env` (`E2E_CLERK_USER_EMAIL`/`E2E_CLERK_USER_PASSWORD`). Nel test il login usa la strategia "codice email" per non far scattare la verifica nuovo-dispositivo.
 
 ---
 
@@ -228,6 +230,8 @@ Atlas/
 ├─ docker-compose.yml             # Postgres locale
 ├─ .env / .env.example            # variabili (env NON committato)
 ├─ prisma.config.ts               # config Prisma 7 (datasource, seed)
+├─ playwright.config.ts           # config test E2E
+├─ e2e/                           # test Playwright (flusso critico)
 ├─ prisma/
 │  ├─ schema.prisma               # modello dati (fonte di verità)
 │  ├─ migrations/                 # storia delle migration
@@ -237,17 +241,22 @@ Atlas/
 ├─ src/app/
 │  ├─ (auth)/                     # sign-in / sign-up
 │  ├─ (dashboard)/                # app autenticata; ogni modulo ha actions.ts
+│  │  ├─ team/                    # gestione ruoli/reparti (solo ADMIN)
+│  │  └─ cerca/                   # risultati ricerca globale
 │  ├─ api/webhooks/clerk/         # sync utenti Clerk → DB
+│  ├─ api/cerca/                  # suggerimenti anteprima ricerca (JSON)
 │  └─ globals.css                 # design token (Tailwind 4: @theme + :root/.dark)
 ├─ src/components/
 │  ├─ ui/                         # componenti shadcn (button.tsx personalizzato: pill)
-│  └─ ...                         # componenti riusabili (sidebar, form, badge, kanban…)
+│  └─ ...                         # riusabili: sidebar, global-search, kanban, pagination-bar,
+│                                 #   breadcrumbs, theme-toggle, filter-bar, form…
 ├─ src/config/
 │  └─ brand.ts                    # nome/tagline del prodotto (Atlas) — unico punto da cambiare
 └─ src/lib/
    ├─ prisma.ts                   # singleton PrismaClient (driver adapter pg)
    ├─ auth.ts                     # utente corrente, requireUser/requireAdmin, sync Clerk
    ├─ labels.ts                   # enum → etichette italiane + colori badge
+   ├─ pagination.ts               # PAGE_SIZE/parsePage (condivisi server+client)
    └─ format.ts                   # date/valuta/minuti (locale it)
 ```
 

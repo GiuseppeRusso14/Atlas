@@ -2,7 +2,7 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
-> **STATO: v1 COMPLETATA (luglio 2026).** Tutte le 10 milestone sono implementate e committate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+> **STATO: v1 + v1.1 COMPLETATE (luglio 2026).** Tutte le milestone 1–15 sono implementate e committate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`. Note post-implementazione segnalate nel testo con **[v1]**.
 
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
@@ -437,13 +437,13 @@ Procedi in quest'ordine, verificando che ogni milestone giri prima di passare al
 9. **Dashboard** — KPI, grafici, feed attività, alert scadenze.
 10. **Rifinitura** — stati loading/error, responsive, coerenza design token, pulizia.
 
-**Milestone v1.1 (migliorie post-v1, luglio 2026):**
+**Milestone v1.1 (migliorie post-v1, luglio 2026) — ✅ TUTTE COMPLETATE:**
 
-11. **Team (solo ADMIN)** — pagina con lista utenti e cambio ruolo/reparto dalla UI (senza Prisma Studio); protezione: un ADMIN non può declassare l'ultimo ADMIN.
-12. **Tema scuro** — toggle chiaro/scuro/sistema con `next-themes` sui token `.dark` già predisposti.
-13. **Paginazione** — liste clienti/progetti/preventivi paginate server-side.
-14. **UX** — ricerca globale (clienti, progetti, task, preventivi) e breadcrumb nelle pagine di dettaglio. (Le azioni sui task sono già tracciate nell'activity log del progetto.)
-15. **Test E2E** — Playwright: login (utente di test Clerk) → crea cliente → progetto → task.
+11. **Team (solo ADMIN)** — pagina `/team` con lista utenti e cambio ruolo/reparto dalla UI (senza Prisma Studio); protezione: un ADMIN non può declassare l'ultimo ADMIN.
+12. **Tema scuro** — toggle chiaro/scuro con `next-themes` (in sidebar e mobile nav) sui token `.dark`; anche componenti Clerk e grafici si adattano.
+13. **Paginazione** — liste clienti/progetti/preventivi paginate server-side (25/pagina, param `pagina`; i filtri resettano la pagina). Utility condivise in `src/lib/pagination.ts` (fuori dai moduli client: non invocabili dai Server Components).
+14. **UX** — ricerca globale `/cerca` con **anteprima live** nella sidebar (dropdown via `/api/cerca`, debounce, risultati raggruppati e cliccabili); barra di ricerca anche sulla lista preventivi (numero o cliente); breadcrumb su tutte le pagine di dettaglio/modifica/creazione; `cursor: pointer` ripristinato globalmente sugli elementi cliccabili (Tailwind 4 non lo applica più ai button).
+15. **Test E2E** — Playwright (`npm run test:e2e`): login con utente di test Clerk (strategia codice email, OTP fisso 424242 — il login con password farebbe scattare la verifica nuovo-dispositivo ad ogni run) → crea cliente → progetto → task → eliminazione di pulizia.
 
 ---
 
