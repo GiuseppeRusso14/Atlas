@@ -14,6 +14,7 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { FilterBar } from "@/components/filter-bar";
+import { PAGE_SIZE, PaginationBar, parsePage } from "@/components/pagination-bar";
 import {
   AREA_LABEL,
   PAYMENT_STATUS,
@@ -38,6 +39,7 @@ type SearchParams = Promise<{
   cliente?: string;
   reparto?: string;
   pagamento?: string;
+  pagina?: string;
 }>;
 
 export default async function ProgettiPage({
@@ -45,7 +47,9 @@ export default async function ProgettiPage({
 }: {
   searchParams: SearchParams;
 }) {
-  const { q, area, stato, cliente, reparto, pagamento } = await searchParams;
+  const { q, area, stato, cliente, reparto, pagamento, pagina } =
+    await searchParams;
+  const page = parsePage(pagina);
 
   const where: Prisma.ProjectWhereInput = {};
   if (q) where.name = { contains: q, mode: "insensitive" };
@@ -57,18 +61,21 @@ export default async function ProgettiPage({
   if (reparto && reparto in REPARTO_LABEL)
     where.members = { some: { reparto: reparto as Reparto } };
 
-  const [projects, clients] = await Promise.all([
+  const [projects, totalCount, clients] = await Promise.all([
     prisma.project.findMany({
       where,
       orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
       include: { client: true, members: true },
     }),
+    prisma.project.count({ where }),
     prisma.client.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   return (
     <>
-      <PageHeader title="Progetti" subtitle={`${projects.length} progetti`}>
+      <PageHeader title="Progetti" subtitle={`${totalCount} progetti`}>
         <Button asChild>
           <Link href="/progetti/nuovo">
             <Plus data-icon="inline-start" /> Nuovo progetto
@@ -168,6 +175,7 @@ export default async function ProgettiPage({
               </TableBody>
             </Table>
           )}
+          <PaginationBar page={page} totalCount={totalCount} />
         </CardContent>
       </Card>
     </>

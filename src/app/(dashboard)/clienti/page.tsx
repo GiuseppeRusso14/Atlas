@@ -15,12 +15,13 @@ import {
 import { PageHeader } from "@/components/page-header";
 import { StatusBadge } from "@/components/status-badge";
 import { FilterBar } from "@/components/filter-bar";
+import { PAGE_SIZE, PaginationBar, parsePage } from "@/components/pagination-bar";
 import { CLIENT_STATUS } from "@/lib/labels";
 import type { ClientStatus, Prisma } from "@/generated/prisma/client";
 
 export const metadata = { title: "Clienti" };
 
-type SearchParams = Promise<{ stato?: string; q?: string }>;
+type SearchParams = Promise<{ stato?: string; q?: string; pagina?: string }>;
 
 export default async function ClientiPage({
   searchParams,
@@ -28,24 +29,30 @@ export default async function ClientiPage({
   searchParams: SearchParams;
 }) {
   // Next 16: searchParams è una Promise, va atteso.
-  const { stato, q } = await searchParams;
+  const { stato, q, pagina } = await searchParams;
+  const page = parsePage(pagina);
 
   const where: Prisma.ClientWhereInput = {};
   if (stato && stato in CLIENT_STATUS) where.status = stato as ClientStatus;
   if (q) where.name = { contains: q, mode: "insensitive" };
 
-  const clients = await prisma.client.findMany({
-    where,
-    orderBy: { updatedAt: "desc" },
-    include: {
-      contacts: { where: { isPrimary: true }, take: 1 },
-      _count: { select: { projects: true, quotes: true } },
-    },
-  });
+  const [clients, totalCount] = await Promise.all([
+    prisma.client.findMany({
+      where,
+      orderBy: { updatedAt: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
+      include: {
+        contacts: { where: { isPrimary: true }, take: 1 },
+        _count: { select: { projects: true, quotes: true } },
+      },
+    }),
+    prisma.client.count({ where }),
+  ]);
 
   return (
     <>
-      <PageHeader title="Clienti" subtitle={`${clients.length} clienti`}>
+      <PageHeader title="Clienti" subtitle={`${totalCount} clienti`}>
         <Button asChild>
           <Link href="/clienti/nuovo">
             <Plus data-icon="inline-start" /> Nuovo cliente
@@ -121,6 +128,7 @@ export default async function ClientiPage({
               </TableBody>
             </Table>
           )}
+          <PaginationBar page={page} totalCount={totalCount} />
         </CardContent>
       </Card>
     </>

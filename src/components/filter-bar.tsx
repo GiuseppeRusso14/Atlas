@@ -41,6 +41,7 @@ export function FilterBar({
     } else {
       params.delete(key);
     }
+    params.delete("pagina"); // cambiando filtro si riparte dalla prima pagina
     router.replace(`${pathname}?${params.toString()}`);
   }
 

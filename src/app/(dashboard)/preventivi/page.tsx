@@ -13,6 +13,7 @@ import {
 } from "@/components/ui/table";
 import { PageHeader } from "@/components/page-header";
 import { FilterBar } from "@/components/filter-bar";
+import { PAGE_SIZE, PaginationBar, parsePage } from "@/components/pagination-bar";
 import { InlineStatusSelect } from "@/components/inline-status-select";
 import { QUOTE_STATUS } from "@/lib/labels";
 import { formatCurrency, formatDate } from "@/lib/format";
@@ -26,31 +27,35 @@ const QUOTE_STATUS_OPTIONS = Object.entries(QUOTE_STATUS).map(([value, s]) => ({
   label: s.label,
 }));
 
-type SearchParams = Promise<{ stato?: string; cliente?: string }>;
+type SearchParams = Promise<{ stato?: string; cliente?: string; pagina?: string }>;
 
 export default async function PreventiviPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { stato, cliente } = await searchParams;
+  const { stato, cliente, pagina } = await searchParams;
+  const page = parsePage(pagina);
 
   const where: Prisma.QuoteWhereInput = {};
   if (stato && stato in QUOTE_STATUS) where.status = stato as QuoteStatus;
   if (cliente) where.clientId = cliente;
 
-  const [quotes, clients] = await Promise.all([
+  const [quotes, totalCount, clients] = await Promise.all([
     prisma.quote.findMany({
       where,
       orderBy: { number: "desc" },
+      skip: (page - 1) * PAGE_SIZE,
+      take: PAGE_SIZE,
       include: { client: true, project: true, items: true },
     }),
+    prisma.quote.count({ where }),
     prisma.client.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
   ]);
 
   return (
     <>
-      <PageHeader title="Preventivi" subtitle={`${quotes.length} preventivi`}>
+      <PageHeader title="Preventivi" subtitle={`${totalCount} preventivi`}>
         <Button asChild>
           <Link href="/preventivi/nuovo">
             <Plus data-icon="inline-start" /> Nuovo preventivo
@@ -137,6 +142,7 @@ export default async function PreventiviPage({
               </TableBody>
             </Table>
           )}
+          <PaginationBar page={page} totalCount={totalCount} />
         </CardContent>
       </Card>
     </>
