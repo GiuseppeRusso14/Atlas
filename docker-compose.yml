@@ -1,0 +1,16 @@
+services:
+  db:
+    image: postgres:16
+    container_name: gestionale-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: gestionale
+      POSTGRES_PASSWORD: gestionale
+      POSTGRES_DB: gestionale
+    ports:
+      - "5432:5432"
+    volumes:
+      - gestionale_pgdata:/var/lib/postgresql/data
+
+volumes:
+  gestionale_pgdata:
