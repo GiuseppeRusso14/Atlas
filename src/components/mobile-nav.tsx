@@ -13,12 +13,12 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { NAV_ITEMS } from "@/components/app-sidebar";
+import { navItemsFor } from "@/components/app-sidebar";
 import { brand, brandMonogram } from "@/config/brand";
 import { cn } from "@/lib/utils";
 
 /** Barra superiore mobile con menu a scomparsa (sotto md la sidebar è nascosta). */
-export function MobileNav() {
+export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
   const [open, setOpen] = useState(false);
   const pathname = usePathname();
 
@@ -48,7 +48,7 @@ export function MobileNav() {
               <SheetTitle className="text-sidebar-foreground">{brand.name}</SheetTitle>
             </SheetHeader>
             <nav className="flex flex-col gap-1 px-2">
-              {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+              {navItemsFor(isAdmin).map(({ href, label, icon: Icon }) => {
                 const active =
                   href === "/" ? pathname === "/" : pathname.startsWith(href);
                 return (

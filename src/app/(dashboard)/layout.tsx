@@ -15,7 +15,7 @@ export default async function DashboardLayout({
 
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
-      <MobileNav />
+      <MobileNav isAdmin={user.role === "ADMIN"} />
       <AppSidebar
         userName={user.name}
         userRole={user.role}

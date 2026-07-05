@@ -1,6 +1,13 @@
 import { prisma } from "@/lib/prisma";
 
-type EntityType = "Client" | "Project" | "Task" | "Quote" | "TimeEntry" | "Resource";
+type EntityType =
+  | "Client"
+  | "Project"
+  | "Task"
+  | "Quote"
+  | "TimeEntry"
+  | "Resource"
+  | "User";
 
 /**
  * Registra un'azione nell'activity log. Best-effort: un errore qui non

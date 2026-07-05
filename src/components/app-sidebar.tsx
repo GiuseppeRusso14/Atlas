@@ -9,6 +9,7 @@ import {
   LayoutDashboard,
   SquareCheckBig,
   Users,
+  UsersRound,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
 import { brand, brandMonogram } from "@/config/brand";
@@ -21,7 +22,13 @@ export const NAV_ITEMS = [
   { href: "/task", label: "Task", icon: SquareCheckBig },
   { href: "/preventivi", label: "Preventivi", icon: FileText },
   { href: "/ore", label: "Ore", icon: Clock },
+  { href: "/team", label: "Team", icon: UsersRound, adminOnly: true },
 ] as const;
+
+/** Voci di navigazione visibili per il ruolo dato. */
+export function navItemsFor(isAdmin: boolean) {
+  return NAV_ITEMS.filter((item) => !("adminOnly" in item) || isAdmin);
+}
 
 const REPARTO_LABEL: Record<string, string> = {
   WEB: "Web",
@@ -52,7 +59,7 @@ export function AppSidebar({ userName, userRole, userReparto }: AppSidebarProps)
       </div>
 
       <nav className="flex flex-1 flex-col gap-1 px-3">
-        {NAV_ITEMS.map(({ href, label, icon: Icon }) => {
+        {navItemsFor(userRole === "ADMIN").map(({ href, label, icon: Icon }) => {
           const active =
             href === "/" ? pathname === "/" : pathname.startsWith(href);
           return (
