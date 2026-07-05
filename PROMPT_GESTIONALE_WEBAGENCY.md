@@ -447,6 +447,21 @@ Procedi in quest'ordine, verificando che ogni milestone giri prima di passare al
 14. **UX** — ricerca globale `/cerca` con **anteprima live** nella sidebar (dropdown via `/api/cerca`, debounce, risultati raggruppati e cliccabili); barra di ricerca anche sulla lista preventivi (numero o cliente); breadcrumb su tutte le pagine di dettaglio/modifica/creazione; `cursor: pointer` ripristinato globalmente sugli elementi cliccabili (Tailwind 4 non lo applica più ai button).
 15. **Test E2E** — Playwright (`npm run test:e2e`): login con utente di test Clerk (strategia codice email, OTP fisso 424242 — il login con password farebbe scattare la verifica nuovo-dispositivo ad ogni run) → crea cliente → progetto → task → eliminazione di pulizia.
 
+**Milestone v1.2 (risparmio tempo settimanale + qualità):**
+
+16. **Export PDF preventivi** — pagina di stampa A4 (`/preventivi/[id]/stampa`, layout senza sidebar) con carta intestata dal brand config, righe e totale; bottone "Scarica PDF" (stampa del browser → salva come PDF, zero dipendenze).
+17. **Preventivo accettato → progetto** — sul preventivo ACCETTATO senza progetto collegato: bottone "Crea progetto" che precompila cliente, budget (dal totale) e descrizione (dalle righe), collega il preventivo e apre la modifica del progetto.
+18. **Calendario globale** — vista `/calendario` mensile con tutto insieme: post social di tutti i progetti, deadline progetti, scadenze dominio/hosting/SSL, task in scadenza; filtri per tipo, voce in sidebar.
+19. **Report mensile** — `/report` per mese: ore per cliente/progetto e preventivi accettati, con export CSV.
+20. **CI GitHub Actions** — lint + typecheck + build ad ogni push (E2E attivabile con i secrets Clerk).
+21. **Backup locale** — script `pg_dump` documentato in COMANDI.md (produzione: point-in-time Neon).
+
+**Milestone v2 (pianificate, da fare a prodotto in produzione):**
+
+22. **Commenti sui task** con @menzioni.
+23. **Notifiche** — campanella in-app per assegnazioni e scadenze (email di digest solo con consenso esplicito e provider dedicato).
+24. **Duplicazione/template** — duplica preventivo; progetto da template con task predefiniti.
+
 ---
 
 ## 12. Criteri di accettazione v1
