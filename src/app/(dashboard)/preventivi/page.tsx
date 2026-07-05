@@ -28,19 +28,31 @@ const QUOTE_STATUS_OPTIONS = Object.entries(QUOTE_STATUS).map(([value, s]) => ({
   label: s.label,
 }));
 
-type SearchParams = Promise<{ stato?: string; cliente?: string; pagina?: string }>;
+type SearchParams = Promise<{
+  q?: string;
+  stato?: string;
+  cliente?: string;
+  pagina?: string;
+}>;
 
 export default async function PreventiviPage({
   searchParams,
 }: {
   searchParams: SearchParams;
 }) {
-  const { stato, cliente, pagina } = await searchParams;
+  const { q, stato, cliente, pagina } = await searchParams;
   const page = parsePage(pagina);
 
   const where: Prisma.QuoteWhereInput = {};
   if (stato && stato in QUOTE_STATUS) where.status = stato as QuoteStatus;
   if (cliente) where.clientId = cliente;
+  if (q) {
+    // Cerca per numero preventivo o per ragione sociale del cliente.
+    where.OR = [
+      { number: { contains: q, mode: "insensitive" } },
+      { client: { name: { contains: q, mode: "insensitive" } } },
+    ];
+  }
 
   const [quotes, totalCount, clients] = await Promise.all([
     prisma.quote.findMany({
@@ -65,6 +77,7 @@ export default async function PreventiviPage({
       </PageHeader>
 
       <FilterBar
+        searchPlaceholder="Cerca per numero o cliente…"
         filters={[
           { param: "stato", label: "Stato", options: QUOTE_STATUS_OPTIONS },
           {
