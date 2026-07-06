@@ -18,6 +18,7 @@ import { TaskDialog } from "@/components/task/task-dialog";
 import { TaskTrashActions } from "@/components/task/task-trash-actions";
 import { StatusBadge } from "@/components/status-badge";
 import { PRIORITY, REPARTO_LABEL, TASK_STATUS } from "@/lib/labels";
+import { TRASH_RETENTION_DAYS } from "@/lib/trash-purge";
 import { formatDate } from "@/lib/format";
 import { saveTaskAction } from "./actions";
 import type { Priority, Prisma, Reparto } from "@/generated/prisma/client";
@@ -101,6 +102,10 @@ export default async function TaskPage({
       {isTrash ? (
         <Card>
           <CardContent>
+            <p className="mb-4 text-xs text-muted-foreground">
+              I task nel cestino vengono eliminati definitivamente in automatico
+              dopo {TRASH_RETENTION_DAYS} giorni.
+            </p>
             {trashedTasks.length === 0 ? (
               <p className="py-8 text-center text-sm text-muted-foreground">
                 Il cestino è vuoto.

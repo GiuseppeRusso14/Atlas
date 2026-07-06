@@ -31,6 +31,7 @@ import { REPARTO_LABEL } from "@/lib/labels";
 import { QUOTE_FOLLOW_UP_DAYS, quoteWaitingDays } from "@/lib/quotes";
 import { ensureRenewalTasks } from "@/lib/renewal-tasks";
 import { ensureSubscriptionTodos } from "@/lib/subscription-reminders";
+import { purgeOldTrashedTasks } from "@/lib/trash-purge";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Prisma, Reparto } from "@/generated/prisma/client";
@@ -56,8 +57,12 @@ export default async function DashboardPage({
 }) {
   const { reparto, utente } = await searchParams;
 
-  // "Lazy cron": task di rinnovo (domini/SSL) + to-do promemoria servizi.
-  await Promise.all([ensureRenewalTasks(), ensureSubscriptionTodos()]);
+  // "Lazy cron": task di rinnovo, promemoria servizi, svuotamento cestino (30gg).
+  await Promise.all([
+    ensureRenewalTasks(),
+    ensureSubscriptionTodos(),
+    purgeOldTrashedTasks(),
+  ]);
 
   const now = new Date();
   const in7Days = addDays(now, 7);
