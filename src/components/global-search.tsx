@@ -92,7 +92,7 @@ export function GlobalSearch({ onNavigate }: { onNavigate?: () => void }) {
           }}
           onFocus={() => groups.length > 0 && setOpen(true)}
           onKeyDown={(e) => e.key === "Escape" && setOpen(false)}
-          placeholder="Cerca…"
+          placeholder="Cerca…   ⌘K"
           autoComplete="off"
           aria-label="Cerca in tutto il gestionale"
           className="w-full rounded-xl bg-sidebar-accent py-2 pl-9 pr-3 text-sm text-sidebar-foreground placeholder:text-sidebar-foreground/60 outline-none focus-visible:ring-2 focus-visible:ring-sidebar-ring"

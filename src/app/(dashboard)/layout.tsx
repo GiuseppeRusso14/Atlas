@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { AppSidebar } from "@/components/app-sidebar";
+import { CommandPalette } from "@/components/command-palette";
 import { MobileNav } from "@/components/mobile-nav";
 import { getCurrentUser } from "@/lib/auth";
 
@@ -22,6 +23,7 @@ export default async function DashboardLayout({
         userReparto={user.reparto}
       />
       <main className="min-w-0 flex-1 px-4 py-6 md:px-10 md:py-8">{children}</main>
+      <CommandPalette isAdmin={user.role === "ADMIN"} />
     </div>
   );
 }
