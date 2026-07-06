@@ -29,6 +29,7 @@ import { WeeklyBarChart, type WeeklyDatum } from "@/components/dashboard/weekly-
 import { CompletionRadial } from "@/components/dashboard/completion-radial";
 import { REPARTO_LABEL } from "@/lib/labels";
 import { QUOTE_FOLLOW_UP_DAYS, quoteWaitingDays } from "@/lib/quotes";
+import { ensureRenewalTasks } from "@/lib/renewal-tasks";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Prisma, Reparto } from "@/generated/prisma/client";
@@ -53,6 +54,10 @@ export default async function DashboardPage({
   searchParams: SearchParams;
 }) {
   const { reparto, utente } = await searchParams;
+
+  // "Lazy cron": genera i task di rinnovo per le scadenze entrate in finestra.
+  await ensureRenewalTasks();
+
   const now = new Date();
   const in7Days = addDays(now, 7);
   const in45Days = addDays(now, 45);
