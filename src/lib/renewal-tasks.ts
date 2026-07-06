@@ -71,6 +71,8 @@ export async function ensureRenewalTasks(): Promise<number> {
 
   let created = 0;
   for (const candidate of candidates) {
+    // Il controllo include anche i task cestinati: se l'utente ha cestinato
+    // un promemoria di rinnovo, non va rigenerato a ogni apertura.
     const exists = await prisma.task.findFirst({
       where: { projectId: candidate.projectId, title: candidate.title },
       select: { id: true },

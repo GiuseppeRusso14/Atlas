@@ -59,7 +59,12 @@ export default async function ProgettoPage({
         graphicItems: { orderBy: { createdAt: "desc" } },
         socialPosts: { orderBy: [{ scheduledDate: "asc" }, { createdAt: "desc" }] },
         resources: { orderBy: { createdAt: "desc" } },
-        tasks: { orderBy: { updatedAt: "desc" }, take: 8, include: { assignee: true } },
+        tasks: {
+          where: { deletedAt: null },
+          orderBy: { updatedAt: "desc" },
+          take: 8,
+          include: { assignee: true },
+        },
         timeEntries: { include: { user: true } },
       },
     }),

@@ -44,7 +44,7 @@ export default async function CercaPage({
       include: { client: true },
     }),
     prisma.task.findMany({
-      where: { title: contains },
+      where: { title: contains, deletedAt: null },
       take: TAKE,
       include: { project: true },
     }),

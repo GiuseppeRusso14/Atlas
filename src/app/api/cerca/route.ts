@@ -34,7 +34,7 @@ export async function GET(req: NextRequest) {
       select: { id: true, name: true, client: { select: { name: true } } },
     }),
     prisma.task.findMany({
-      where: { title: contains },
+      where: { title: contains, deletedAt: null },
       take: TAKE,
       select: {
         id: true,

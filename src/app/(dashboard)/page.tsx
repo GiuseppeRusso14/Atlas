@@ -98,7 +98,9 @@ export default async function DashboardPage({
     prisma.project.count({
       where: { ...projectWhere, status: { in: [...ACTIVE_STATUSES] } },
     }),
-    prisma.task.count({ where: { ...taskWhere, status: { not: "FATTO" } } }),
+    prisma.task.count({
+      where: { ...taskWhere, status: { not: "FATTO" }, deletedAt: null },
+    }),
     prisma.quote.count({ where: { status: "INVIATO" } }),
     prisma.user.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } }),
     prisma.project.findMany({
@@ -122,7 +124,12 @@ export default async function DashboardPage({
       include: { project: { select: { id: true, name: true } } },
     }),
     prisma.task.findMany({
-      where: { ...taskWhere, status: "FATTO", updatedAt: { gte: eightWeeksAgo } },
+      where: {
+        ...taskWhere,
+        status: "FATTO",
+        deletedAt: null,
+        updatedAt: { gte: eightWeeksAgo },
+      },
       select: { updatedAt: true },
     }),
     prisma.project.findMany({
@@ -135,7 +142,9 @@ export default async function DashboardPage({
     }),
     prisma.project.findMany({
       where: { ...projectWhere, status: { in: [...ACTIVE_STATUSES] } },
-      select: { tasks: { select: { status: true } } },
+      select: {
+        tasks: { where: { deletedAt: null }, select: { status: true } },
+      },
     }),
     prisma.activityLog.findMany({
       where: activityWhere,

@@ -113,7 +113,34 @@ export async function moveTaskAction(
   return { ok: true };
 }
 
+/** Cestina (soft-delete): il task sparisce dal Kanban ma resta ripristinabile. */
 export async function deleteTaskAction(taskId: string): Promise<ActionResult> {
+  const user = await requireUser();
+  const task = await prisma.task.update({
+    where: { id: taskId },
+    data: { deletedAt: new Date() },
+  });
+  await logActivity(user.id, `ha cestinato il task "${task.title}"`, "Project", task.projectId);
+  revalidatePath("/task");
+  revalidatePath(`/progetti/${task.projectId}`);
+  return { ok: true };
+}
+
+/** Ripristina un task dal cestino (torna nel Kanban col suo stato). */
+export async function restoreTaskAction(taskId: string): Promise<ActionResult> {
+  const user = await requireUser();
+  const task = await prisma.task.update({
+    where: { id: taskId },
+    data: { deletedAt: null },
+  });
+  await logActivity(user.id, `ha ripristinato il task "${task.title}"`, "Project", task.projectId);
+  revalidatePath("/task");
+  revalidatePath(`/progetti/${task.projectId}`);
+  return { ok: true };
+}
+
+/** Eliminazione definitiva dal cestino (non reversibile). */
+export async function hardDeleteTaskAction(taskId: string): Promise<ActionResult> {
   await requireUser();
   const task = await prisma.task.delete({ where: { id: taskId } });
   revalidatePath("/task");

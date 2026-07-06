@@ -46,7 +46,7 @@ export default async function MioLavoroPage({
       ? prisma.user.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
       : Promise.resolve([]),
     prisma.task.findMany({
-      where: { assigneeId: viewedUser.id, status: { not: "FATTO" } },
+      where: { assigneeId: viewedUser.id, status: { not: "FATTO" }, deletedAt: null },
       orderBy: [{ dueDate: "asc" }, { priority: "desc" }],
       include: { project: { select: { id: true, name: true } } },
     }),

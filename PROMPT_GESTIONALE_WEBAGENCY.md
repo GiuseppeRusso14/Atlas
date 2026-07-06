@@ -539,6 +539,7 @@ Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.
 
 30. **Promemoria servizi** — su `/utile` card "Da registrare a <mese>": servizi attivi senza spesa registrata nel mese (mensili sempre attesi, annuali nel mese di rinnovo) con "Registra pagamento" inline. Campi `renewalDate`/`reviewDate` sugli abbonamenti: rinnovi e disdette-da-valutare compaiono nel **calendario globale** (tipo "Rinnovi servizi") e generano **to-do personali automatiche** per l'ADMIN a 14 giorni (lazy-cron `src/lib/subscription-reminders.ts`, idempotente per titolo; il promemoria di pagamento non nasce se la spesa del mese di rinnovo è già registrata). Badge "Da valutare" sui servizi con reviewDate scaduta.
 31. **To-do evolute** — **ricorrenze** settimanali/mensili su to-do personali e task di progetto: al completamento (spunta, o task in FATTO da Kanban/dialog) rinasce l'occorrenza successiva con scadenza avanzata (icona ↻). **Promozione to-do → task**: bottone sulla to-do personale che la trasforma in task di progetto assegnato a sé (titolo, scadenza e ricorrenza conservati; la to-do viene rimossa).
+32. **Cestino dei task** — eliminare un task è un soft-delete (`Task.deletedAt`): sparisce da Kanban, dashboard, calendario, "Il mio lavoro", ricerca e dettaglio progetto, ma resta nella vista "Cestino" di `/task` (toggle in header, con conteggio) da cui **ripristinare** o eliminare definitivamente (con conferma). Il lazy-cron dei rinnovi non rigenera i promemoria cestinati di proposito.
 
 **Milestone v2 (pianificate, da fare a prodotto in produzione):**
 

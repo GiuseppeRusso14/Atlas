@@ -67,7 +67,7 @@ export default async function CalendarioPage({
       include: { project: { select: { id: true, name: true } } },
     }),
     prisma.task.findMany({
-      where: { dueDate: range, status: { not: "FATTO" } },
+      where: { dueDate: range, status: { not: "FATTO" }, deletedAt: null },
       include: { project: { select: { id: true, name: true } } },
     }),
     prisma.project.findMany({
