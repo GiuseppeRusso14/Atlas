@@ -71,15 +71,16 @@ export function AppSidebar({ userName, userRole, userReparto }: AppSidebarProps)
       {/* Ricerca globale con anteprima dei risultati */}
       <GlobalSearch />
 
-      {/* Apre la command palette (equivalente di ⌘K, per chi usa il mouse) */}
+      {/* Apre la command palette (equivalente di ⌘K, per chi usa il mouse).
+          Superficie invertita (token sidebar-primary): risalta sul corallo. */}
       <button
         type="button"
         onClick={openCommandPalette}
-        className="mx-3 mb-3 flex items-center gap-3 rounded-xl border border-sidebar-border px-4 py-2.5 text-sm font-medium text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+        className="mx-3 mb-3 flex items-center gap-3 rounded-xl bg-sidebar-primary px-4 py-2.5 text-sm font-semibold text-sidebar-primary-foreground shadow-sm transition-opacity hover:opacity-90"
       >
         <Zap className="size-4.5" aria-hidden />
         Azioni rapide
-        <kbd className="ml-auto rounded-md bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-semibold">
+        <kbd className="ml-auto rounded-md bg-sidebar-primary-foreground/10 px-1.5 py-0.5 text-[10px] font-semibold">
           ⌘K
         </kbd>
       </button>

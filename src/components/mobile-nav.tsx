@@ -58,7 +58,7 @@ export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
                 setOpen(false);
                 openCommandPalette();
               }}
-              className="mx-2 mb-2 flex items-center gap-3 rounded-xl border border-sidebar-border px-4 py-2.5 text-sm font-medium text-sidebar-foreground/90 hover:bg-sidebar-accent/60"
+              className="mx-2 mb-2 flex items-center gap-3 rounded-xl bg-sidebar-primary px-4 py-2.5 text-sm font-semibold text-sidebar-primary-foreground shadow-sm hover:opacity-90"
             >
               <Zap className="size-4.5" aria-hidden />
               Azioni rapide
