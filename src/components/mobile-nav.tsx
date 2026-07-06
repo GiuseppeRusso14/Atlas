@@ -3,8 +3,9 @@
 import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Menu } from "lucide-react";
+import { Menu, Zap } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
+import { openCommandPalette } from "@/components/command-palette";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -51,6 +52,17 @@ export function MobileNav({ isAdmin }: { isAdmin: boolean }) {
               <SheetTitle className="text-sidebar-foreground">{brand.name}</SheetTitle>
             </SheetHeader>
             <GlobalSearch onNavigate={() => setOpen(false)} />
+            <button
+              type="button"
+              onClick={() => {
+                setOpen(false);
+                openCommandPalette();
+              }}
+              className="mx-2 mb-2 flex items-center gap-3 rounded-xl border border-sidebar-border px-4 py-2.5 text-sm font-medium text-sidebar-foreground/90 hover:bg-sidebar-accent/60"
+            >
+              <Zap className="size-4.5" aria-hidden />
+              Azioni rapide
+            </button>
             <nav className="flex flex-col gap-1 px-2">
               {navItemsFor(isAdmin).map(({ href, label, icon: Icon }) => {
                 const active =

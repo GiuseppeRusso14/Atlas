@@ -13,8 +13,10 @@ import {
   SquareCheckBig,
   Users,
   UsersRound,
+  Zap,
 } from "lucide-react";
 import { UserButton } from "@clerk/nextjs";
+import { openCommandPalette } from "@/components/command-palette";
 import { GlobalSearch } from "@/components/global-search";
 import { ThemeToggle } from "@/components/theme-toggle";
 import { brand, brandMonogram } from "@/config/brand";
@@ -68,6 +70,19 @@ export function AppSidebar({ userName, userRole, userReparto }: AppSidebarProps)
 
       {/* Ricerca globale con anteprima dei risultati */}
       <GlobalSearch />
+
+      {/* Apre la command palette (equivalente di ⌘K, per chi usa il mouse) */}
+      <button
+        type="button"
+        onClick={openCommandPalette}
+        className="mx-3 mb-3 flex items-center gap-3 rounded-xl border border-sidebar-border px-4 py-2.5 text-sm font-medium text-sidebar-foreground/90 transition-colors hover:bg-sidebar-accent/60 hover:text-sidebar-foreground"
+      >
+        <Zap className="size-4.5" aria-hidden />
+        Azioni rapide
+        <kbd className="ml-auto rounded-md bg-sidebar-accent px-1.5 py-0.5 text-[10px] font-semibold">
+          ⌘K
+        </kbd>
+      </button>
 
       <nav className="flex flex-1 flex-col gap-1 px-3">
         {navItemsFor(userRole === "ADMIN").map(({ href, label, icon: Icon }) => {

@@ -20,6 +20,14 @@ type SearchGroup = {
   items: { href: string; label: string; sublabel?: string }[];
 };
 
+/** Evento globale per aprire la palette da qualsiasi punto della UI. */
+const OPEN_PALETTE_EVENT = "atlas:open-command-palette";
+
+/** Apre la command palette (usato dal bottone "Azioni rapide" in sidebar). */
+export function openCommandPalette() {
+  window.dispatchEvent(new CustomEvent(OPEN_PALETTE_EVENT));
+}
+
 /** Azioni rapide di creazione, oltre alla navigazione. */
 const QUICK_ACTIONS = [
   { href: "/clienti/nuovo", label: "Nuovo cliente", icon: UserPlus },
@@ -39,7 +47,7 @@ export function CommandPalette({ isAdmin }: { isAdmin: boolean }) {
   const [query, setQuery] = useState("");
   const [groups, setGroups] = useState<SearchGroup[]>([]);
 
-  // Scorciatoia globale ⌘K / Ctrl+K.
+  // Scorciatoia globale ⌘K / Ctrl+K + evento dal bottone "Azioni rapide".
   useEffect(() => {
     function onKeyDown(e: KeyboardEvent) {
       if (e.key === "k" && (e.metaKey || e.ctrlKey)) {
@@ -47,8 +55,15 @@ export function CommandPalette({ isAdmin }: { isAdmin: boolean }) {
         setOpen((prev) => !prev);
       }
     }
+    function onOpenEvent() {
+      setOpen(true);
+    }
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    window.addEventListener(OPEN_PALETTE_EVENT, onOpenEvent);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      window.removeEventListener(OPEN_PALETTE_EVENT, onOpenEvent);
+    };
   }, []);
 
   // Ricerca live (debounce): risultati dal DB oltre ai comandi statici.
