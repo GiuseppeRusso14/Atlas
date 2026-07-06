@@ -40,6 +40,10 @@ export async function addProfitEntryAction(
     return { ok: false, fieldErrors: { amount: ["Importo non valido"] } };
   }
 
+  // il preventivo di provenienza ha senso solo per gli accantonamenti
+  const quoteId =
+    d.type === "ACCANTONAMENTO" && d.quoteId && d.quoteId !== NONE ? d.quoteId : null;
+
   await prisma.profitEntry.create({
     data: {
       type: d.type,
@@ -47,10 +51,10 @@ export async function addProfitEntryAction(
       description: d.description,
       date: d.date ? new Date(d.date) : new Date(),
       userId: user.id,
-      // il preventivo di provenienza ha senso solo per gli accantonamenti
-      quoteId: d.type === "ACCANTONAMENTO" && d.quoteId && d.quoteId !== NONE ? d.quoteId : null,
+      quoteId,
     },
   });
+  if (quoteId) revalidatePath(`/preventivi/${quoteId}`);
   await logActivity(
     user.id,
     d.type === "ACCANTONAMENTO"

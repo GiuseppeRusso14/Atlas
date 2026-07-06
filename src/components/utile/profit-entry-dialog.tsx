@@ -30,13 +30,18 @@ type QuoteOption = { id: string; label: string };
 /**
  * Dialog per registrare un movimento dell'utile: accantonamento (con
  * preventivo di provenienza opzionale) oppure spesa libera.
+ * Con `fixedQuote` il preventivo è preimpostato (uso dal dettaglio preventivo).
  */
 export function ProfitEntryDialog({
   type,
   quotes = [],
+  fixedQuote,
+  defaultDescription,
 }: {
   type: "ACCANTONAMENTO" | "SPESA";
   quotes?: QuoteOption[];
+  fixedQuote?: { id: string; label: string };
+  defaultDescription?: string;
 }) {
   const [open, setOpen] = useState(false);
   const isIn = type === "ACCANTONAMENTO";
@@ -63,7 +68,7 @@ export function ProfitEntryDialog({
           ) : (
             <Receipt data-icon="inline-start" />
           )}
-          {isIn ? "Accantonamento" : "Spesa"}
+          {fixedQuote ? "Accantona nell'utile" : isIn ? "Accantonamento" : "Spesa"}
         </Button>
       </DialogTrigger>
       <DialogContent>
@@ -92,13 +97,22 @@ export function ProfitEntryDialog({
             <Input
               id="description"
               name="description"
+              defaultValue={defaultDescription}
               placeholder={
                 isIn ? "es. Quota dal saldo Boutique Milù" : "es. Licenza font annuale"
               }
               required
             />
           </FormField>
-          {isIn && quotes.length > 0 ? (
+          {fixedQuote ? (
+            <>
+              <input type="hidden" name="quoteId" value={fixedQuote.id} />
+              <p className="text-xs text-muted-foreground">
+                Verrà collegato al preventivo {fixedQuote.label}.
+              </p>
+            </>
+          ) : null}
+          {isIn && !fixedQuote && quotes.length > 0 ? (
             <FormField
               label="Preventivo di provenienza (opzionale)"
               name="quoteId"

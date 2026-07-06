@@ -15,6 +15,7 @@ import {
 import { Breadcrumbs } from "@/components/breadcrumbs";
 import { InlineStatusSelect } from "@/components/inline-status-select";
 import { ConfirmActionButton } from "@/components/confirm-action-button";
+import { ProfitEntryDialog } from "@/components/utile/profit-entry-dialog";
 import { QUOTE_STATUS } from "@/lib/labels";
 import { formatCurrency, formatDate } from "@/lib/format";
 import {
@@ -92,6 +93,13 @@ export default async function PreventivoPage({
                 <FolderPlus data-icon="inline-start" /> Crea progetto
               </Button>
             </form>
+          ) : null}
+          {quote.status === "ACCETTATO" ? (
+            <ProfitEntryDialog
+              type="ACCANTONAMENTO"
+              fixedQuote={{ id: quote.id, label: quote.number }}
+              defaultDescription={`Quota dal preventivo ${quote.number} — ${quote.client.name}`}
+            />
           ) : null}
           <Button variant="outline" asChild>
             <Link href={`/preventivi/${quote.id}/stampa`} target="_blank">
