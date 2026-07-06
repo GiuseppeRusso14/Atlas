@@ -2,7 +2,7 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
-> **STATO: v1 + v1.1 + v1.2 + v1.3 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+> **STATO: v1 + v1.1 + v1.2 + v1.3 + v1.4 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25–28 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
 
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
@@ -485,6 +485,12 @@ Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.
 **Milestone v1.3 (produttività personale) — ✅ COMPLETATA:**
 
 25. **"Il mio lavoro"** — pagina `/mio-lavoro` (voce in sidebar per tutti): KPI ore settimana e task aperti, i miei task per scadenza (ritardi in rosso), i miei progetti attivi, to-do list personale e note personali (modelli `PersonalTodo`/`PersonalNote`, slegati dai progetti). Selettore utente per l'ADMIN (vede tutto di tutti, note comprese, in sola lettura). ⚠️ Dopo `prisma migrate dev`/`generate` va riavviato il dev server: il singleton Prisma su `globalThis` trattiene il client vecchio.
+
+**Milestone v1.4 (commerciale + automazioni + UX tastiera) — ✅ TUTTE COMPLETATE:**
+
+26. **Follow-up preventivi** — colonna "In attesa da" sulla lista (rosso oltre soglia) e card "Preventivi da sollecitare" in dashboard; soglia in `src/lib/quotes.ts` (`QUOTE_FOLLOW_UP_DAYS`, default 7 giorni), attesa calcolata dalla data di emissione.
+27. **Scadenze → task automatici** — quando dominio/hosting/SSL entra nella finestra dei 30 giorni (`src/lib/renewal-tasks.ts`), nasce da solo un task "Rinnovare…" con dueDate = scadenza, priorità ALTA, assegnato al primo ADMIN. Meccanismo "lazy cron" (gira all'apertura della dashboard, niente infrastruttura); idempotente per titolo (contiene la data di scadenza: dopo il rinnovo la data cambia → nuovo task all'anno successivo).
+28. **Command palette ⌘K** — apribile ovunque con ⌘K/Ctrl+K (componente `command` shadcn/cmdk): azioni rapide (nuovo cliente/progetto/preventivo, registra ore), navigazione (voce Team solo ADMIN) e ricerca live via `/api/cerca`.
 
 **Milestone v2 (pianificate, da fare a prodotto in produzione):**
 
