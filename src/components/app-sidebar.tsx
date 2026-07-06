@@ -11,6 +11,7 @@ import {
   LayoutDashboard,
   ListChecks,
   PiggyBank,
+  ScrollText,
   SquareCheckBig,
   Users,
   UsersRound,
@@ -34,6 +35,7 @@ export const NAV_ITEMS = [
   { href: "/ore", label: "Ore", icon: Clock },
   { href: "/report", label: "Report", icon: ChartColumn },
   { href: "/utile", label: "Utile", icon: PiggyBank },
+  { href: "/log", label: "Log", icon: ScrollText, adminOnly: true },
   { href: "/team", label: "Team", icon: UsersRound, adminOnly: true },
 ] as const;
 
