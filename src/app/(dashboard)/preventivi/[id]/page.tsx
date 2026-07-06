@@ -36,11 +36,19 @@ export default async function PreventivoPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const quote = await prisma.quote.findUnique({
-    where: { id },
-    include: { client: true, project: true, items: true },
-  });
+  const [quote, setAside] = await Promise.all([
+    prisma.quote.findUnique({
+      where: { id },
+      include: { client: true, project: true, items: true },
+    }),
+    // quanto di questo preventivo è già stato accantonato nell'utile
+    prisma.profitEntry.aggregate({
+      where: { quoteId: id, type: "ACCANTONAMENTO" },
+      _sum: { amount: true },
+    }),
+  ]);
   if (!quote) notFound();
+  const setAsideTotal = Number(setAside._sum.amount ?? 0);
 
   const total = quote.items.reduce(
     (sum, item) => sum + Number(item.quantity) * Number(item.unitPrice),
@@ -153,6 +161,16 @@ export default async function PreventivoPage({
             <dd>{formatDate(quote.issuedDate)}</dd>
             <dt className="text-muted-foreground">Valido fino al</dt>
             <dd>{formatDate(quote.validUntil)}</dd>
+            {setAsideTotal > 0 ? (
+              <>
+                <dt className="text-muted-foreground">Accantonato nell&apos;utile</dt>
+                <dd>
+                  <Link href="/utile" className="font-medium text-success hover:underline">
+                    {formatCurrency(setAsideTotal)}
+                  </Link>
+                </dd>
+              </>
+            ) : null}
           </dl>
           {quote.notes ? (
             <p className="mt-4 whitespace-pre-wrap rounded-lg bg-muted p-3 text-sm">

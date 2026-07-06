@@ -2,7 +2,7 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
-> **STATO: v1 + v1.1 + v1.2 + v1.3 + v1.4 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25–28 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+> **STATO: v1 + v1.1 + v1.2 + v1.3 + v1.4 + v1.5 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25–29 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
 
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
@@ -330,6 +330,39 @@ model PersonalNote {
   updatedAt DateTime @updatedAt
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
+
+// ---------- [v1.5] Utile aziendale (salvadanaio per i servizi) ----------
+enum ProfitEntryType { ACCANTONAMENTO SPESA }
+enum BillingCycle    { MENSILE ANNUALE }
+
+// Libro mastro: saldo = somma accantonamenti - somma spese. Tutto manuale.
+model ProfitEntry {
+  id             String          @id @default(cuid())
+  type           ProfitEntryType
+  amount         Decimal         @db.Decimal(10,2)
+  description    String
+  date           DateTime        @default(now())
+  userId         String          // chi ha registrato il movimento
+  quoteId        String?         // accantonamento: preventivo di provenienza
+  subscriptionId String?         // spesa: abbonamento pagato
+  createdAt      DateTime        @default(now())
+  user           User            @relation(fields: [userId], references: [id])
+  quote          Quote?          @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  subscription   Subscription?   @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+}
+
+// Anagrafica servizi aziendali (Adobe, Figma, Claude…)
+model Subscription {
+  id        String       @id @default(cuid())
+  name      String
+  cost      Decimal      @db.Decimal(10,2)
+  billing   BillingCycle @default(MENSILE)
+  active    Boolean      @default(true)
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+  profitEntries ProfitEntry[]
+}
 ```
 
 > **Nota sicurezza:** NON prevedere campi per salvare password o credenziali di accesso (FTP, hosting, CMS) in chiaro. Se serve tracciare accessi, usare un `Resource` di tipo `LINK` che punta a un password manager esterno.
@@ -348,6 +381,7 @@ model PersonalNote {
 - **Time tracking** — inserimento ore per progetto (minuti, data, nota). Riepilogo ore per progetto e per utente.
 - **Note & Link** — modello `Resource`, agganciabile a cliente o progetto. Sostituisce lo storage file.
 - **Activity log** — registra le azioni principali (creazione/modifica/cambio stato) per cliente e progetto, mostrato nel dettaglio.
+- **[v1.5] "Utile"** (`/utile`, visibile a tutto il team) — salvadanaio aziendale: **accantonamenti manuali** dai guadagni (importo libero, con preventivo di provenienza opzionale) e **spese** per i servizi aziendali. Anagrafica abbonamenti (nome, costo, mensile/annuale, attivo) con "Registra pagamento" in un click; KPI saldo disponibile, accantonato totale, costo servizi/mese (annuali /12) e autonomia in mesi. Eliminazione movimenti: solo autore o ADMIN. Sul dettaglio preventivo compare "Accantonato nell'utile" quando esistono movimenti collegati.
 - **[v1.3] "Il mio lavoro"** (`/mio-lavoro`) — vista personale di chi è loggato: ore della settimana, task assegnati per scadenza, progetti attivi, **to-do personali** (aggiunta inline, spunta, scadenza opzionale, "pulisci completate") e **note personali** (blocco appunti). L'ADMIN ha un selettore per vedere la board di chiunque, **note incluse**, ma in sola lettura; le mutazioni lato server agiscono solo sulle righe dell'utente loggato (il `userId` non arriva mai dal client).
 
 ### 6.2 Area WEB
@@ -491,6 +525,10 @@ Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.
 26. **Follow-up preventivi** — colonna "In attesa da" sulla lista (rosso oltre soglia) e card "Preventivi da sollecitare" in dashboard; soglia in `src/lib/quotes.ts` (`QUOTE_FOLLOW_UP_DAYS`, default 7 giorni), attesa calcolata dalla data di emissione.
 27. **Scadenze → task automatici** — quando dominio/hosting/SSL entra nella finestra dei 30 giorni (`src/lib/renewal-tasks.ts`), nasce da solo un task "Rinnovare…" con dueDate = scadenza, priorità ALTA, assegnato al primo ADMIN. Meccanismo "lazy cron" (gira all'apertura della dashboard, niente infrastruttura); idempotente per titolo (contiene la data di scadenza: dopo il rinnovo la data cambia → nuovo task all'anno successivo).
 28. **Command palette ⌘K** — apribile ovunque con ⌘K/Ctrl+K (componente `command` shadcn/cmdk): azioni rapide (nuovo cliente/progetto/preventivo, registra ore), navigazione (voce Team solo ADMIN) e ricerca live via `/api/cerca`.
+
+**Milestone v1.5 (utile aziendale) — ✅ COMPLETATA:**
+
+29. **"Utile"** — pagina `/utile` con libro mastro (modelli `ProfitEntry`/`Subscription`): accantonamenti manuali dai guadagni e spese servizi, tutto registrato a mano (scelta esplicita: nessun automatismo su accettazione/saldo, nessun addebito ricorrente automatico). KPI saldo/accantonato/costo mensile/autonomia; visibile a tutto il team.
 
 **Milestone v2 (pianificate, da fare a prodotto in produzione):**
 

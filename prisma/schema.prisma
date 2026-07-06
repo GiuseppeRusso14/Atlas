@@ -74,6 +74,17 @@ enum ResourceType {
   NOTA
 }
 
+// Utile aziendale (salvadanaio per i servizi)
+enum ProfitEntryType {
+  ACCANTONAMENTO // entrata: soldi messi da parte
+  SPESA // uscita: pagamento servizi/abbonamenti
+}
+
+enum BillingCycle {
+  MENSILE
+  ANNUALE
+}
+
 // Sottotipi area WEB
 enum WebSubtype {
   SITO_VETRINA
@@ -136,6 +147,7 @@ model User {
   activities     ActivityLog[]
   personalTodos  PersonalTodo[]
   personalNotes  PersonalNote[]
+  profitEntries  ProfitEntry[]
 }
 
 model Client {
@@ -237,9 +249,10 @@ model Quote {
   createdAt  DateTime    @default(now())
   updatedAt  DateTime    @updatedAt
 
-  client  Client      @relation(fields: [clientId], references: [id], onDelete: Cascade)
-  project Project?    @relation(fields: [projectId], references: [id])
-  items   QuoteItem[]
+  client        Client        @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  project       Project?      @relation(fields: [projectId], references: [id])
+  items         QuoteItem[]
+  profitEntries ProfitEntry[]
   // total calcolato dagli items on-read (non persistito perché derivabile)
 
   @@index([clientId])
@@ -378,4 +391,43 @@ model PersonalNote {
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, updatedAt])
+}
+
+// ---------- Utile aziendale (salvadanaio per i servizi) ----------
+// Libro mastro: accantonamenti dai guadagni (entrate) e spese per i
+// servizi aziendali (uscite). Saldo = somma accantonamenti - somma spese.
+model ProfitEntry {
+  id             String          @id @default(cuid())
+  type           ProfitEntryType
+  amount         Decimal         @db.Decimal(10, 2)
+  description    String
+  date           DateTime        @default(now())
+  userId         String // chi ha registrato il movimento
+  quoteId        String? // accantonamento: da quale preventivo arrivano i soldi
+  subscriptionId String? // spesa: quale abbonamento è stato pagato
+  createdAt      DateTime        @default(now())
+
+  user         User          @relation(fields: [userId], references: [id])
+  quote        Quote?        @relation(fields: [quoteId], references: [id], onDelete: SetNull)
+  subscription Subscription? @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+
+  @@index([type, date])
+  @@index([quoteId])
+}
+
+// Servizi/abbonamenti aziendali (Adobe, Figma, Claude…): anagrafica di
+// riferimento; il pagamento reale si registra come ProfitEntry SPESA.
+model Subscription {
+  id        String       @id @default(cuid())
+  name      String
+  cost      Decimal      @db.Decimal(10, 2)
+  billing   BillingCycle @default(MENSILE)
+  active    Boolean      @default(true)
+  notes     String?
+  createdAt DateTime     @default(now())
+  updatedAt DateTime     @updatedAt
+
+  profitEntries ProfitEntry[]
+
+  @@index([active])
 }

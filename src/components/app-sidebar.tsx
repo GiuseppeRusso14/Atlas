@@ -10,6 +10,7 @@ import {
   FolderKanban,
   LayoutDashboard,
   ListChecks,
+  PiggyBank,
   SquareCheckBig,
   Users,
   UsersRound,
@@ -32,6 +33,7 @@ export const NAV_ITEMS = [
   { href: "/preventivi", label: "Preventivi", icon: FileText },
   { href: "/ore", label: "Ore", icon: Clock },
   { href: "/report", label: "Report", icon: ChartColumn },
+  { href: "/utile", label: "Utile", icon: PiggyBank },
   { href: "/team", label: "Team", icon: UsersRound, adminOnly: true },
 ] as const;
 

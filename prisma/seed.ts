@@ -52,6 +52,8 @@ function daysFromNow(days: number): Date {
 
 async function main() {
   // Ordine di cancellazione: prima le tabelle dipendenti, poi il backbone.
+  await prisma.profitEntry.deleteMany();
+  await prisma.subscription.deleteMany();
   await prisma.activityLog.deleteMany();
   await prisma.timeEntry.deleteMany();
   await prisma.quoteItem.deleteMany();
@@ -323,7 +325,7 @@ async function main() {
     },
   });
 
-  await prisma.quote.create({
+  const quoteEcommerce = await prisma.quote.create({
     data: {
       clientId: boutique.id,
       projectId: ecommerceBoutique.id,
@@ -382,6 +384,25 @@ async function main() {
       { userId: social.id, action: "ha programmato un post", entityType: "Project", entityId: socialMilu.id },
       { userId: admin.id, action: "ha inviato il preventivo 2026-0007", entityType: "Client", entityId: palestra.id },
       { userId: grafico.id, action: "ha aggiornato il deliverable Template stories", entityType: "Project", entityId: graficheMilu.id },
+    ],
+  });
+
+  // ---------- Utile aziendale (salvadanaio servizi) ----------
+  const adobe = await prisma.subscription.create({
+    data: { name: "Adobe Creative Cloud", cost: "69.99", billing: "MENSILE", notes: "piano Single App x2" },
+  });
+  await prisma.subscription.createMany({
+    data: [
+      { name: "Figma Professional", cost: "15.00", billing: "MENSILE" },
+      { name: "Claude Pro", cost: "21.00", billing: "MENSILE" },
+      { name: "Google Workspace", cost: "138.00", billing: "ANNUALE", notes: "3 caselle" },
+    ],
+  });
+  await prisma.profitEntry.createMany({
+    data: [
+      { type: "ACCANTONAMENTO", amount: "650.00", description: "Quota dal preventivo e-commerce Milù", userId: admin.id, quoteId: quoteEcommerce.id, date: daysFromNow(-10) },
+      { type: "ACCANTONAMENTO", amount: "200.00", description: "Extra da manutenzioni giugno", userId: admin.id, date: daysFromNow(-20) },
+      { type: "SPESA", amount: "69.99", description: "Adobe Creative Cloud — canone mensile", userId: admin.id, subscriptionId: adobe.id, date: daysFromNow(-5) },
     ],
   });
 
