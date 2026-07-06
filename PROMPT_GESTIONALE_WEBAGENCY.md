@@ -516,7 +516,7 @@ Procedi in quest'ordine, verificando che ogni milestone giri prima di passare al
 17. **Preventivo accettato → progetto** — sul preventivo ACCETTATO senza progetto collegato: bottone "Crea progetto" che precompila cliente, budget (dal totale) e descrizione (dalle righe), collega il preventivo e apre la modifica del progetto.
 18. **Calendario globale** — vista `/calendario` mensile con tutto insieme: post social di tutti i progetti, deadline progetti, scadenze dominio/hosting/SSL, task in scadenza; filtri per tipo (badge toggle), voce in sidebar.
 19. **Report mensile** — `/report` per mese: ore per cliente/progetto e preventivi accettati (attribuiti per data di emissione), KPI e export CSV (`/api/report/csv`); voce in sidebar.
-20. **CI GitHub Actions** — `.github/workflows/ci.yml`: lint + typecheck + build ad ogni push/PR su main; job E2E già scritto ma commentato (si attiva coi secrets Clerk sul repo).
+20. **CI GitHub Actions** — ~~implementata e poi **rimossa per scelta** (luglio 2026)~~: falliva per cause ambientali e duplicava controlli già coperti (lint/typecheck/build/E2E girano in locale a ogni modifica; in produzione la build di Vercel a ogni push fa da gate). Se servirà di nuovo (più dev, PR esterne), si reintroduce con un file in `.github/workflows/`.
 21. **Backup locale** — comandi `pg_dump`/ripristino documentati in COMANDI.md (produzione: point-in-time Neon).
 
 Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.

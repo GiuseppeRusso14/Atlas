@@ -82,7 +82,6 @@ Il remote esiste già (`github.com/GiuseppeRusso14/Atlas`) ed è vuoto. La crono
 
 ## Dopo il go-live (consigliati, non bloccanti)
 
-- [ ] **CI su GitHub Actions**: lint + typecheck + build ad ogni push
 - [ ] **Error tracking** (es. Sentry) per accorgersi degli errori prima che li segnali il team
 - [ ] Backup: verifica retention point-in-time su Neon
 - [ ] Chiavi di sviluppo e produzione SEMPRE separate (`.env` locale = solo dev)
