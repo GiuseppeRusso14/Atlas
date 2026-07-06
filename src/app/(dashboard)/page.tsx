@@ -13,6 +13,7 @@ import {
   FileText,
   FolderKanban,
   Globe,
+  Hourglass,
   Server,
   ShieldCheck,
   SquareCheckBig,
@@ -27,6 +28,7 @@ import { KpiCard } from "@/components/dashboard/kpi-card";
 import { WeeklyBarChart, type WeeklyDatum } from "@/components/dashboard/weekly-bar-chart";
 import { CompletionRadial } from "@/components/dashboard/completion-radial";
 import { REPARTO_LABEL } from "@/lib/labels";
+import { QUOTE_FOLLOW_UP_DAYS, quoteWaitingDays } from "@/lib/quotes";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Prisma, Reparto } from "@/generated/prisma/client";
@@ -85,6 +87,7 @@ export default async function DashboardPage({
     completedProjects,
     activeWithTasks,
     activities,
+    sentQuotes,
   ] = await Promise.all([
     prisma.project.count({
       where: { ...projectWhere, status: { in: [...ACTIVE_STATUSES] } },
@@ -134,7 +137,17 @@ export default async function DashboardPage({
       orderBy: { createdAt: "desc" },
       take: 8,
     }),
+    prisma.quote.findMany({
+      where: { status: "INVIATO" },
+      include: { client: { select: { name: true } } },
+      orderBy: { issuedDate: "asc" },
+    }),
   ]);
+
+  // Preventivi inviati in attesa di risposta, i più "freddi" per primi.
+  const waitingQuotes = sentQuotes
+    .map((q) => ({ ...q, waitingDays: quoteWaitingDays(q) }))
+    .sort((a, b) => b.waitingDays - a.waitingDays);
 
   // ---- Grafico settimanale (ultime 8 settimane) ----
   const weeks: WeeklyDatum[] = Array.from({ length: 8 }, (_, i) => {
@@ -282,7 +295,8 @@ export default async function DashboardPage({
           </CardContent>
         </Card>
 
-        {/* Alert scadenze */}
+        {/* Colonna alert: scadenze + preventivi da sollecitare */}
+        <div className="space-y-4">
         <Card>
           <CardHeader>
             <CardTitle>Alert scadenze</CardTitle>
@@ -340,6 +354,65 @@ export default async function DashboardPage({
             )}
           </CardContent>
         </Card>
+
+        {/* Follow-up preventivi: inviati e in attesa di risposta */}
+        <Card>
+          <CardHeader>
+            <CardTitle>Preventivi da sollecitare</CardTitle>
+          </CardHeader>
+          <CardContent>
+            {waitingQuotes.length === 0 ? (
+              <p className="text-sm text-muted-foreground">
+                Nessun preventivo in attesa di risposta.
+              </p>
+            ) : (
+              <ul className="space-y-3">
+                {waitingQuotes.slice(0, 6).map((quote) => {
+                  const cold = quote.waitingDays >= QUOTE_FOLLOW_UP_DAYS;
+                  return (
+                    <li key={quote.id} className="flex items-center gap-3">
+                      <span
+                        className={cn(
+                          "flex size-9 shrink-0 items-center justify-center rounded-xl",
+                          cold
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-accent text-primary"
+                        )}
+                      >
+                        <Hourglass className="size-4" />
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          href={`/preventivi/${quote.id}`}
+                          className="text-sm font-medium hover:underline"
+                        >
+                          {quote.number}
+                        </Link>
+                        <p className="truncate text-xs text-muted-foreground">
+                          {quote.client.name}
+                        </p>
+                      </div>
+                      <Badge
+                        variant="secondary"
+                        className={cn(
+                          "shrink-0 border-transparent",
+                          cold
+                            ? "bg-destructive/10 text-destructive"
+                            : "bg-muted text-muted-foreground"
+                        )}
+                      >
+                        {quote.waitingDays === 0
+                          ? "oggi"
+                          : `${quote.waitingDays} gg`}
+                      </Badge>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </CardContent>
+        </Card>
+        </div>
       </div>
     </>
   );

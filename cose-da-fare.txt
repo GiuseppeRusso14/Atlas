@@ -13,13 +13,13 @@ Idee v2 più ambiziose (quando il resto è in produzione)
 Commenti sui task (con @menzioni) — il primo pezzo di collaborazione vera; oggi i commenti passano per WhatsApp.
 Notifiche — campanella in-app per assegnazioni e scadenze; le email di digest solo se/quando vorrai, con provider dedicato e sempre col tuo consenso esplicito.
 Duplicazione/template — "duplica preventivo" e "progetto da template" (es. il pacchetto sito vetrina standard con i suoi task già pronti).
+"Il mio lavoro" — una pagina personale per Anna e Sara: i miei task ordinati per scadenza, i miei progetti, le ore della settimana. La dashboard attuale è la vista del titolare; questa è la vista di chi apre il gestionale per sapere cosa fare oggi. aggiungi anche i task personali che possono crearseli da soli
 
 
 Prossimo
 
 Follow-up preventivi — la più redditizia: un preventivo "Inviato" da più di X giorni senza risposta è un affare che si sta raffreddando. Alert in dashboard ("2026-0007 inviato 12 giorni fa, nessuna risposta") e magari una colonna "in attesa da" nella lista. Costa poco, vale molto.
 
-"Il mio lavoro" — una pagina personale per Anna e Sara: i miei task ordinati per scadenza, i miei progetti, le ore della settimana. La dashboard attuale è la vista del titolare; questa è la vista di chi apre il gestionale per sapere cosa fare oggi. aggiungi anche i task personali che possono crearseli da soli
 
 Scadenze → task automatici — quando dominio/hosting/SSL entra nella finestra dei 30 giorni, generare da solo un task "Rinnovare dominio X" assegnato a te. Oggi l'alert in dashboard lo devi vedere; il task invece ti insegue.
 

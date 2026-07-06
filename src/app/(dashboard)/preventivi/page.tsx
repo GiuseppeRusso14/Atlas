@@ -17,7 +17,9 @@ import { PaginationBar } from "@/components/pagination-bar";
 import { PAGE_SIZE, parsePage } from "@/lib/pagination";
 import { InlineStatusSelect } from "@/components/inline-status-select";
 import { QUOTE_STATUS } from "@/lib/labels";
+import { QUOTE_FOLLOW_UP_DAYS, quoteWaitingDays } from "@/lib/quotes";
 import { formatCurrency, formatDate } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { updateQuoteStatusAction } from "./actions";
 import type { Prisma, QuoteStatus } from "@/generated/prisma/client";
 
@@ -103,6 +105,7 @@ export default async function PreventiviPage({
                   <TableHead>Progetto</TableHead>
                   <TableHead>Emesso il</TableHead>
                   <TableHead>Stato</TableHead>
+                  <TableHead>In attesa da</TableHead>
                   <TableHead className="text-right">Totale</TableHead>
                   <TableHead className="w-28" />
                 </TableRow>
@@ -147,6 +150,27 @@ export default async function PreventiviPage({
                           options={QUOTE_STATUS_OPTIONS}
                           action={updateQuoteStatusAction.bind(null, quote.id)}
                         />
+                      </TableCell>
+                      <TableCell>
+                        {quote.status === "INVIATO" ? (
+                          (() => {
+                            const days = quoteWaitingDays(quote);
+                            return (
+                              <span
+                                className={cn(
+                                  "text-sm",
+                                  days >= QUOTE_FOLLOW_UP_DAYS
+                                    ? "font-semibold text-destructive"
+                                    : "text-muted-foreground"
+                                )}
+                              >
+                                {days} gg
+                              </span>
+                            );
+                          })()
+                        ) : (
+                          <span className="text-muted-foreground">—</span>
+                        )}
                       </TableCell>
                       <TableCell className="text-right font-semibold">
                         {formatCurrency(total)}
