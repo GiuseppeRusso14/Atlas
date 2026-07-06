@@ -143,7 +143,23 @@ export function TaskDialog({
                 defaultValue={toDateInputValue(task?.dueDate)}
               />
             </FormField>
+            <FormField label="Ripetizione" name="repeat" errors={state.fieldErrors}>
+              <Select name="repeat" defaultValue={task?.repeat ?? NONE}>
+                <SelectTrigger id="repeat" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NONE}>Nessuna</SelectItem>
+                  <SelectItem value="SETTIMANALE">Settimanale</SelectItem>
+                  <SelectItem value="MENSILE">Mensile</SelectItem>
+                </SelectContent>
+              </Select>
+            </FormField>
           </div>
+          <p className="text-xs text-muted-foreground">
+            Un task ripetuto rinasce in &quot;Da fare&quot; (con scadenza avanzata)
+            quando lo completi.
+          </p>
           <FormField label="Descrizione" name="description" errors={state.fieldErrors}>
             <Textarea
               id="description"

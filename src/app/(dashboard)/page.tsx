@@ -30,6 +30,7 @@ import { CompletionRadial } from "@/components/dashboard/completion-radial";
 import { REPARTO_LABEL } from "@/lib/labels";
 import { QUOTE_FOLLOW_UP_DAYS, quoteWaitingDays } from "@/lib/quotes";
 import { ensureRenewalTasks } from "@/lib/renewal-tasks";
+import { ensureSubscriptionTodos } from "@/lib/subscription-reminders";
 import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { Prisma, Reparto } from "@/generated/prisma/client";
@@ -55,8 +56,8 @@ export default async function DashboardPage({
 }) {
   const { reparto, utente } = await searchParams;
 
-  // "Lazy cron": genera i task di rinnovo per le scadenze entrate in finestra.
-  await ensureRenewalTasks();
+  // "Lazy cron": task di rinnovo (domini/SSL) + to-do promemoria servizi.
+  await Promise.all([ensureRenewalTasks(), ensureSubscriptionTodos()]);
 
   const now = new Date();
   const in7Days = addDays(now, 7);

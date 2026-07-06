@@ -85,6 +85,12 @@ enum BillingCycle {
   ANNUALE
 }
 
+// Ricorrenza di to-do personali e task: al completamento rinasce l'occorrenza successiva.
+enum Recurrence {
+  SETTIMANALE
+  MENSILE
+}
+
 // Sottotipi area WEB
 enum WebSubtype {
   SITO_VETRINA
@@ -218,16 +224,17 @@ model Project {
 }
 
 model Task {
-  id          String     @id @default(cuid())
+  id          String      @id @default(cuid())
   projectId   String
   title       String
   description String?
-  status      TaskStatus @default(TODO)
-  priority    Priority   @default(MEDIA)
+  status      TaskStatus  @default(TODO)
+  priority    Priority    @default(MEDIA)
   assigneeId  String?
   dueDate     DateTime?
-  createdAt   DateTime   @default(now())
-  updatedAt   DateTime   @updatedAt
+  repeat      Recurrence? // al passaggio a FATTO rinasce l'occorrenza successiva
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
 
   project  Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
   assignee User?   @relation(fields: [assigneeId], references: [id])
@@ -368,14 +375,15 @@ model SocialPost {
 // To-do list personale: leggera e slegata dai progetti (i Task di progetto
 // restano un'altra cosa, con Kanban e assegnatario).
 model PersonalTodo {
-  id        String    @id @default(cuid())
+  id        String      @id @default(cuid())
   userId    String
   title     String
-  done      Boolean   @default(false)
+  done      Boolean     @default(false)
   dueDate   DateTime?
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  repeat    Recurrence? // alla spunta rinasce l'occorrenza successiva
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+  user      User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, done])
 }
@@ -418,14 +426,16 @@ model ProfitEntry {
 // Servizi/abbonamenti aziendali (Adobe, Figma, Claude…): anagrafica di
 // riferimento; il pagamento reale si registra come ProfitEntry SPESA.
 model Subscription {
-  id        String       @id @default(cuid())
-  name      String
-  cost      Decimal      @db.Decimal(10, 2)
-  billing   BillingCycle @default(MENSILE)
-  active    Boolean      @default(true)
-  notes     String?
-  createdAt DateTime     @default(now())
-  updatedAt DateTime     @updatedAt
+  id          String       @id @default(cuid())
+  name        String
+  cost        Decimal      @db.Decimal(10, 2)
+  billing     BillingCycle @default(MENSILE)
+  active      Boolean      @default(true)
+  renewalDate DateTime? // prossimo rinnovo (per calendario e to-do automatiche)
+  reviewDate  DateTime? // "valutare disdetta entro" (anti abbonamenti-zombie)
+  notes       String?
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
 
   profitEntries ProfitEntry[]
 

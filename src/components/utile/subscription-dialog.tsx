@@ -31,8 +31,13 @@ export type SubscriptionFormValues = {
   cost: string;
   billing: "MENSILE" | "ANNUALE";
   active: boolean;
+  renewalDate: Date | null;
+  reviewDate: Date | null;
   notes: string | null;
 };
+
+const dateValue = (d: Date | null | undefined) =>
+  d ? d.toISOString().slice(0, 10) : "";
 
 /** Dialog di creazione/modifica di un servizio aziendale. */
 export function SubscriptionDialog({
@@ -107,6 +112,24 @@ export function SubscriptionDialog({
                   <SelectItem value="ANNUALE">Annuale</SelectItem>
                 </SelectContent>
               </Select>
+            </FormField>
+          </div>
+          <div className="grid grid-cols-2 gap-4">
+            <FormField label="Prossimo rinnovo" name="renewalDate" errors={state.fieldErrors}>
+              <Input
+                id="renewalDate"
+                name="renewalDate"
+                type="date"
+                defaultValue={dateValue(subscription?.renewalDate)}
+              />
+            </FormField>
+            <FormField label="Valutare disdetta entro" name="reviewDate" errors={state.fieldErrors}>
+              <Input
+                id="reviewDate"
+                name="reviewDate"
+                type="date"
+                defaultValue={dateValue(subscription?.reviewDate)}
+              />
             </FormField>
           </div>
           <FormField label="Note" name="notes" errors={state.fieldErrors}>

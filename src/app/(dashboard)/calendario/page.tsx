@@ -28,6 +28,7 @@ const EVENT_TYPES = {
   task: { label: "Task", chip: "bg-primary/10 text-primary" },
   deadline: { label: "Deadline progetti", chip: "bg-destructive/10 text-destructive" },
   web: { label: "Scadenze dominio/SSL", chip: "bg-secondary text-secondary-foreground" },
+  servizio: { label: "Rinnovi servizi", chip: "bg-success/10 text-success" },
 } as const;
 
 type EventType = keyof typeof EVENT_TYPES;
@@ -60,7 +61,7 @@ export default async function CalendarioPage({
       : (Object.keys(EVENT_TYPES) as EventType[])
   );
 
-  const [posts, tasks, deadlines, webDetails] = await Promise.all([
+  const [posts, tasks, deadlines, webDetails, subscriptions] = await Promise.all([
     prisma.socialPost.findMany({
       where: { scheduledDate: range },
       include: { project: { select: { id: true, name: true } } },
@@ -83,6 +84,12 @@ export default async function CalendarioPage({
         ],
       },
       include: { project: { select: { id: true, name: true } } },
+    }),
+    prisma.subscription.findMany({
+      where: {
+        active: true,
+        OR: [{ renewalDate: range }, { reviewDate: range }],
+      },
     }),
   ]);
 
@@ -107,6 +114,16 @@ export default async function CalendarioPage({
       label: `Deadline: ${p.name}`,
       href: `/progetti/${p.id}`,
     })),
+    ...subscriptions.flatMap((s) => {
+      const list: CalendarEvent[] = [];
+      const inRange = (x: Date | null): x is Date =>
+        !!x && x >= gridStart && x <= gridEnd;
+      if (inRange(s.renewalDate))
+        list.push({ date: s.renewalDate, type: "servizio", label: `Rinnovo ${s.name}`, href: "/utile" });
+      if (inRange(s.reviewDate))
+        list.push({ date: s.reviewDate, type: "servizio", label: `Valutare disdetta ${s.name}`, href: "/utile" });
+      return list;
+    }),
     ...webDetails.flatMap((d) => {
       const list: CalendarEvent[] = [];
       const inRange = (x: Date | null): x is Date =>

@@ -1,11 +1,19 @@
 "use client";
 
 import { useActionState, useRef, useTransition } from "react";
-import { Check, Plus, Trash2 } from "lucide-react";
+import { Check, Plus, Repeat, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { PromoteTodoDialog } from "@/components/mio-lavoro/promote-todo-dialog";
 import {
   addTodoAction,
   clearDoneTodosAction,
@@ -16,15 +24,20 @@ import { formatDate } from "@/lib/format";
 import { cn } from "@/lib/utils";
 import type { PersonalTodo } from "@/generated/prisma/client";
 
+const NONE = "__none__";
+
 /**
- * To-do list personale con aggiunta inline, spunta e eliminazione.
+ * To-do list personale con aggiunta inline (scadenza e ricorrenza opzionali),
+ * spunta, promozione a task di progetto ed eliminazione.
  * In sola lettura (readOnly) quando l'ADMIN sta vedendo la board altrui.
  */
 export function PersonalTodos({
   todos,
+  projects = [],
   readOnly = false,
 }: {
   todos: PersonalTodo[];
+  projects?: { id: string; name: string }[];
   readOnly?: boolean;
 }) {
   const formRef = useRef<HTMLFormElement>(null);
@@ -76,6 +89,16 @@ export function PersonalTodos({
               aria-label="Scadenza"
               className="w-40"
             />
+            <Select name="repeat" defaultValue={NONE}>
+              <SelectTrigger aria-label="Ripetizione" className="w-32">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={NONE}>Una volta</SelectItem>
+                <SelectItem value="SETTIMANALE">Settimanale</SelectItem>
+                <SelectItem value="MENSILE">Mensile</SelectItem>
+              </SelectContent>
+            </Select>
             <Button type="submit" size="icon" aria-label="Aggiungi" disabled={isPending}>
               <Plus />
             </Button>
@@ -110,11 +133,21 @@ export function PersonalTodos({
                 </button>
                 <span
                   className={cn(
-                    "min-w-0 flex-1 text-sm",
+                    "flex min-w-0 flex-1 items-center gap-1.5 text-sm",
                     todo.done && "text-muted-foreground line-through"
                   )}
                 >
-                  {todo.title}
+                  <span className="truncate">{todo.title}</span>
+                  {todo.repeat ? (
+                    <Repeat
+                      className="size-3 shrink-0 text-muted-foreground"
+                      aria-label={
+                        todo.repeat === "SETTIMANALE"
+                          ? "Si ripete ogni settimana"
+                          : "Si ripete ogni mese"
+                      }
+                    />
+                  ) : null}
                 </span>
                 {todo.dueDate ? (
                   <span
@@ -129,14 +162,23 @@ export function PersonalTodos({
                   </span>
                 ) : null}
                 {!readOnly ? (
-                  <Button
-                    variant="ghost"
-                    size="icon-sm"
-                    aria-label="Elimina"
-                    onClick={() => run(() => deleteTodoAction(todo.id))}
-                  >
-                    <Trash2 className="text-muted-foreground" />
-                  </Button>
+                  <div className="flex shrink-0 items-center">
+                    {!todo.done && projects.length > 0 ? (
+                      <PromoteTodoDialog
+                        todoId={todo.id}
+                        todoTitle={todo.title}
+                        projects={projects}
+                      />
+                    ) : null}
+                    <Button
+                      variant="ghost"
+                      size="icon-sm"
+                      aria-label="Elimina"
+                      onClick={() => run(() => deleteTodoAction(todo.id))}
+                    >
+                      <Trash2 className="text-muted-foreground" />
+                    </Button>
+                  </div>
                 ) : null}
               </li>
             ))}

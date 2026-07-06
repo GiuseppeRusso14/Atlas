@@ -1,7 +1,7 @@
 "use client";
 
 import { useOptimistic, useState, useTransition } from "react";
-import { CalendarDays } from "lucide-react";
+import { CalendarDays, Repeat } from "lucide-react";
 import { toast } from "sonner";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
@@ -135,6 +135,12 @@ export function KanbanBoard({
                       <CalendarDays className="size-3" />
                       {formatDate(task.dueDate)}
                     </span>
+                  ) : null}
+                  {task.repeat ? (
+                    <Repeat
+                      className="size-3 text-muted-foreground"
+                      aria-label={task.repeat === "SETTIMANALE" ? "Si ripete ogni settimana" : "Si ripete ogni mese"}
+                    />
                   ) : null}
                   {task.assignee ? (
                     <Avatar className="ml-auto size-6" title={task.assignee.name}>

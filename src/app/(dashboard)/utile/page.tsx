@@ -1,5 +1,8 @@
 import Link from "next/link";
+import { endOfMonth, format, startOfMonth } from "date-fns";
+import { it } from "date-fns/locale";
 import {
+  BellRing,
   CalendarClock,
   PiggyBank,
   Receipt,
@@ -30,7 +33,8 @@ import { cn } from "@/lib/utils";
 export const metadata = { title: "Utile" };
 
 export default async function UtilePage() {
-  const [entries, subscriptions, sums, acceptedQuotes] = await Promise.all([
+  const now = new Date();
+  const [entries, subscriptions, sums, acceptedQuotes, paidThisMonth] = await Promise.all([
     prisma.profitEntry.findMany({
       orderBy: { date: "desc" },
       take: 50,
@@ -48,7 +52,29 @@ export default async function UtilePage() {
       take: 30,
       include: { client: { select: { name: true } } },
     }),
+    // spese già registrate nel mese corrente, per la checklist "da registrare"
+    prisma.profitEntry.findMany({
+      where: {
+        type: "SPESA",
+        subscriptionId: { not: null },
+        date: { gte: startOfMonth(now), lte: endOfMonth(now) },
+      },
+      select: { subscriptionId: true },
+    }),
   ]);
+
+  // Checklist mensile: servizi attesi questo mese senza spesa registrata.
+  // Mensili: sempre attesi. Annuali: attesi solo nel mese del rinnovo.
+  const paidIds = new Set(paidThisMonth.map((e) => e.subscriptionId));
+  const dueThisMonth = subscriptions.filter((s) => {
+    if (!s.active || paidIds.has(s.id)) return false;
+    if (s.billing === "MENSILE") return true;
+    return (
+      s.renewalDate !== null &&
+      s.renewalDate.getMonth() === now.getMonth() &&
+      s.renewalDate.getFullYear() === now.getFullYear()
+    );
+  });
 
   const totalIn = Number(
     sums.find((s) => s.type === "ACCANTONAMENTO")?._sum.amount ?? 0
@@ -107,6 +133,36 @@ export default async function UtilePage() {
         />
       </div>
 
+      {/* Checklist mensile: manuale ma assistito — nessun addebito automatico */}
+      {dueThisMonth.length > 0 ? (
+        <Card className="mt-4 border-primary/40">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <BellRing className="size-4 text-primary" />
+              Da registrare a {format(now, "MMMM", { locale: it })}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <ul className="divide-y divide-border">
+              {dueThisMonth.map((s) => (
+                <li key={s.id} className="flex flex-wrap items-center gap-3 py-2.5">
+                  <div className="min-w-0 flex-1">
+                    <p className="font-medium">{s.name}</p>
+                    <p className="text-xs text-muted-foreground">
+                      {formatCurrency(s.cost)} ·{" "}
+                      {s.billing === "ANNUALE"
+                        ? `rinnovo annuale${s.renewalDate ? ` il ${formatDate(s.renewalDate)}` : ""}`
+                        : "canone mensile"}
+                    </p>
+                  </div>
+                  <PaySubscriptionButton subscriptionId={s.id} name={s.name} />
+                </li>
+              ))}
+            </ul>
+          </CardContent>
+        </Card>
+      ) : null}
+
       <div className="mt-4 grid gap-4 lg:grid-cols-2">
         {/* Abbonamenti / servizi */}
         <Card>
@@ -126,10 +182,22 @@ export default async function UtilePage() {
                     <div className="min-w-0 flex-1">
                       <p className={cn("font-medium", !s.active && "text-muted-foreground line-through")}>
                         {s.name}
+                        {s.active && s.reviewDate && s.reviewDate <= now ? (
+                          <Badge
+                            variant="secondary"
+                            className="ml-2 border-transparent bg-destructive/10 text-destructive"
+                          >
+                            Da valutare
+                          </Badge>
+                        ) : null}
                       </p>
                       <p className="text-xs text-muted-foreground">
                         {formatCurrency(s.cost)} ·{" "}
                         {s.billing === "ANNUALE" ? "annuale" : "mensile"}
+                        {s.renewalDate ? ` · rinnovo ${formatDate(s.renewalDate)}` : ""}
+                        {s.reviewDate && s.reviewDate > now
+                          ? ` · valutare entro ${formatDate(s.reviewDate)}`
+                          : ""}
                         {s.notes ? ` · ${s.notes}` : ""}
                       </p>
                     </div>
@@ -148,6 +216,8 @@ export default async function UtilePage() {
                           cost: s.cost.toString(),
                           billing: s.billing,
                           active: s.active,
+                          renewalDate: s.renewalDate,
+                          reviewDate: s.reviewDate,
                           notes: s.notes,
                         }}
                       />

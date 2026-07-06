@@ -2,7 +2,7 @@
 
 > Copia l'intero contenuto di questo file come primo messaggio in Claude Code (o salvalo come `CLAUDE.md` nella root del progetto per usarlo come contesto persistente).
 
-> **STATO: v1 + v1.1 + v1.2 + v1.3 + v1.4 + v1.5 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25–29 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
+> **STATO: v1 + v1.1 → v1.6 COMPLETATE (luglio 2026).** Le milestone 1–21 e 25–31 sono implementate e committate; le 22–24 (v2) sono pianificate. Questo file resta la specifica dei requisiti; per l'operatività quotidiana vedi `README.md` e `COMANDI.md`, per il deploy `Produzione-todo.md`. Note post-implementazione segnalate nel testo con **[v1]**.
 
 **Nome del prodotto:** il gestionale si chiama **Atlas**. Il nome, però, **non va mai scritto a mano nel codice**: deve stare in un unico file di configurazione del brand e va richiamato da lì ovunque compaia (sidebar, `<title>`, header, footer, email). Così cambiare nome in futuro significa modificare una sola riga. Vedi §9.1.
 
@@ -334,6 +334,11 @@ model PersonalNote {
 // ---------- [v1.5] Utile aziendale (salvadanaio per i servizi) ----------
 enum ProfitEntryType { ACCANTONAMENTO SPESA }
 enum BillingCycle    { MENSILE ANNUALE }
+// [v1.6] ricorrenze di to-do/task: al completamento rinasce l'occorrenza successiva
+enum Recurrence      { SETTIMANALE MENSILE }
+// [v1.6] Task e PersonalTodo hanno inoltre `repeat Recurrence?`;
+// Subscription ha `renewalDate DateTime?` (prossimo rinnovo) e
+// `reviewDate DateTime?` ("valutare disdetta entro", anti abbonamenti-zombie).
 
 // Libro mastro: saldo = somma accantonamenti - somma spese. Tutto manuale.
 model ProfitEntry {
@@ -529,6 +534,11 @@ Rifiniture post-v1.2: bottone "Dettagli" sulle righe della lista preventivi.
 **Milestone v1.5 (utile aziendale) — ✅ COMPLETATA:**
 
 29. **"Utile"** — pagina `/utile` con libro mastro (modelli `ProfitEntry`/`Subscription`): accantonamenti manuali dai guadagni e spese servizi, tutto registrato a mano (scelta esplicita: nessun automatismo su accettazione/saldo, nessun addebito ricorrente automatico). KPI saldo/accantonato/costo mensile/autonomia; visibile a tutto il team.
+
+**Milestone v1.6 (promemoria servizi + to-do evolute) — ✅ TUTTE COMPLETATE:**
+
+30. **Promemoria servizi** — su `/utile` card "Da registrare a <mese>": servizi attivi senza spesa registrata nel mese (mensili sempre attesi, annuali nel mese di rinnovo) con "Registra pagamento" inline. Campi `renewalDate`/`reviewDate` sugli abbonamenti: rinnovi e disdette-da-valutare compaiono nel **calendario globale** (tipo "Rinnovi servizi") e generano **to-do personali automatiche** per l'ADMIN a 14 giorni (lazy-cron `src/lib/subscription-reminders.ts`, idempotente per titolo; il promemoria di pagamento non nasce se la spesa del mese di rinnovo è già registrata). Badge "Da valutare" sui servizi con reviewDate scaduta.
+31. **To-do evolute** — **ricorrenze** settimanali/mensili su to-do personali e task di progetto: al completamento (spunta, o task in FATTO da Kanban/dialog) rinasce l'occorrenza successiva con scadenza avanzata (icona ↻). **Promozione to-do → task**: bottone sulla to-do personale che la trasforma in task di progetto assegnato a sé (titolo, scadenza e ricorrenza conservati; la to-do viene rimossa).
 
 **Milestone v2 (pianificate, da fare a prodotto in produzione):**
 

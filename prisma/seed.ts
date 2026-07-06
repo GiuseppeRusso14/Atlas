@@ -394,8 +394,8 @@ async function main() {
   await prisma.subscription.createMany({
     data: [
       { name: "Figma Professional", cost: "15.00", billing: "MENSILE" },
-      { name: "Claude Pro", cost: "21.00", billing: "MENSILE" },
-      { name: "Google Workspace", cost: "138.00", billing: "ANNUALE", notes: "3 caselle" },
+      { name: "Claude Pro", cost: "21.00", billing: "MENSILE", reviewDate: daysFromNow(10) },
+      { name: "Google Workspace", cost: "138.00", billing: "ANNUALE", notes: "3 caselle", renewalDate: daysFromNow(12) },
     ],
   });
   await prisma.profitEntry.createMany({
@@ -411,6 +411,7 @@ async function main() {
     data: [
       { userId: admin.id, title: "Rispondere alla mail di FitLab sul preventivo", dueDate: daysFromNow(1) },
       { userId: admin.id, title: "Preparare fattura acconto Trattoria" },
+      { userId: admin.id, title: "Backup manuale siti in manutenzione", repeat: "MENSILE", dueDate: daysFromNow(5) },
       { userId: admin.id, title: "Aggiornare il portfolio con Boutique Milù", done: true },
       { userId: grafico.id, title: "Esportare gli asset del logo Ferrara in SVG", dueDate: daysFromNow(2) },
       { userId: grafico.id, title: "Cercare font per le grafiche autunno" },

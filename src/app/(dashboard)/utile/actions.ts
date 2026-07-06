@@ -85,6 +85,8 @@ const subscriptionSchema = z.object({
   name: z.string().trim().min(1, "Il nome del servizio è obbligatorio"),
   cost: z.string().min(1, "Inserisci il costo"),
   billing: z.enum(BillingCycle),
+  renewalDate: z.string().optional(),
+  reviewDate: z.string().optional(),
   notes: z.string().optional(),
 });
 
@@ -107,6 +109,8 @@ export async function saveSubscriptionAction(
     name: d.name,
     cost: cost.toFixed(2),
     billing: d.billing,
+    renewalDate: d.renewalDate ? new Date(d.renewalDate) : null,
+    reviewDate: d.reviewDate ? new Date(d.reviewDate) : null,
     notes: d.notes?.trim() || null,
     active: formData.get("active") !== null ? formData.get("active") === "on" : true,
   };

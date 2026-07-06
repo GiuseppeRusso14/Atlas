@@ -41,7 +41,7 @@ export default async function MioLavoroPage({
   const weekStart = startOfWeek(now, { weekStartsOn: 1 });
   const weekEnd = endOfWeek(now, { weekStartsOn: 1 });
 
-  const [users, myTasks, myProjects, weekMinutes, todos, notes] = await Promise.all([
+  const [users, myTasks, myProjects, weekMinutes, todos, notes, allProjects] = await Promise.all([
     isAdmin
       ? prisma.user.findMany({ orderBy: { name: "asc" }, select: { id: true, name: true } })
       : Promise.resolve([]),
@@ -69,6 +69,12 @@ export default async function MioLavoroPage({
     prisma.personalNote.findMany({
       where: { userId: viewedUser.id },
       orderBy: { updatedAt: "desc" },
+    }),
+    // tutti i progetti attivi: destinazioni per "promuovi to-do a task"
+    prisma.project.findMany({
+      where: { status: { notIn: ["COMPLETATO", "ARCHIVIATO"] } },
+      orderBy: { name: "asc" },
+      select: { id: true, name: true },
     }),
   ]);
 
@@ -147,7 +153,11 @@ export default async function MioLavoroPage({
             </CardContent>
           </Card>
 
-          <PersonalTodos todos={todos} readOnly={viewingOther} />
+          <PersonalTodos
+            todos={todos}
+            projects={allProjects}
+            readOnly={viewingOther}
+          />
         </div>
 
         {/* Colonna laterale: progetti + note */}
